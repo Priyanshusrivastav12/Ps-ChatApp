@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "build":"npm install && npm install --prefix Frontend && npm run build --prefix Frontend"
+    "build": "npm install && npm install --prefix Frontend && npm run build --prefix Frontend",
+    "build:frontend": "cd Frontend && npm install && npm run build"
   },
   "keywords": [
     "MERN"

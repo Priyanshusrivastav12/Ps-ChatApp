@@ -20,7 +20,12 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     // Allow localhost on any port for development
-    if (origin.startsWith('http://localhost:')) {
+    if (origin && origin.startsWith('http://localhost:')) {
+      return callback(null, true);
+    }
+    
+    // Allow production domain
+    if (origin === 'https://ps-chatapp.onrender.com') {
       return callback(null, true);
     }
     
@@ -76,7 +81,20 @@ app.use("/api/message", messageRoute);
 
 // Root route for basic health check
 app.get("/", (req, res) => {
-  res.json({ message: "Chat App Backend Server is running!" });
+  res.json({ 
+    message: "Chat App Backend Server is running!",
+    environment: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "OK",
+    environment: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString()
+  });
 });
 
 server.listen(PORT, () => {
@@ -87,11 +105,18 @@ server.listen(PORT, () => {
 if (process.env.NODE_ENV === "production") {
   const dirPath = path.resolve();
 
-  app.use(express.static("./Frontend/dist"));
+  // Serve static files from the frontend build
+  app.use(express.static(path.join(dirPath, "Frontend", "dist")));
 
+  // Handle all other routes by serving the React app
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(dirPath, "./Frontend/dist","index.html"));
-  })
+    try {
+      res.sendFile(path.resolve(dirPath, "Frontend", "dist", "index.html"));
+    } catch (error) {
+      console.error("Error serving index.html:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
 } else {
   // Development mode - serve frontend routes through React Router
   app.get(["/login", "/signup", "/dashboard", "/chat"], (req, res) => {

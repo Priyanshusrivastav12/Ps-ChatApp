@@ -15,7 +15,12 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (authUser) {
-      const socket = io("http://localhost:4001", {
+      // Use current domain in production, localhost in development
+      const serverUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:4001' 
+        : 'https://ps-chatapp.onrender.com';
+        
+      const socket = io(serverUrl, {
         query: {
           userId: authUser.user._id,
         },

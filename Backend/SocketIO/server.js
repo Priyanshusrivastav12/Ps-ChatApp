@@ -12,7 +12,12 @@ const io = new Server(server, {
       if (!origin) return callback(null, true);
       
       // Allow localhost on any port for development
-      if (origin.startsWith('http://localhost:')) {
+      if (origin && origin.startsWith('http://localhost:')) {
+        return callback(null, true);
+      }
+      
+      // Allow production domain
+      if (origin === 'https://ps-chatapp.onrender.com') {
         return callback(null, true);
       }
       
