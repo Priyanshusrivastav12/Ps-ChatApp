@@ -50,12 +50,24 @@ if (process.env.NODE_ENV !== "production") {
 const PORT = process.env.PORT || 4001;
 const URI = process.env.MONGODB_URI;
 
-mongoose.connect(URI)
+if (!URI) {
+  console.error("MONGODB_URI environment variable is not set");
+  process.exit(1);
+}
+
+mongoose.connect(URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => {
     console.log("Connected to MongoDB");
+    console.log("Database:", URI.split('/')[3].split('?')[0]);
   })
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error.message);
+    console.error("Make sure your IP is whitelisted in MongoDB Atlas");
+    console.error("Check: https://www.mongodb.com/docs/atlas/security-whitelist/");
+    process.exit(1);
   });
 
 //routes
