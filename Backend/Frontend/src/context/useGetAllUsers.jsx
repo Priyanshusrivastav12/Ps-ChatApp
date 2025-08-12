@@ -18,12 +18,13 @@ function useGetAllUsers() {
       try {
         const token = Cookies.get("jwt");
         console.log(`👥 Fetching users from: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.ALL_USERS}`);
+        console.log(`🍪 JWT Token exists: ${!!token}`);
         
         const response = await axios.get(API_CONFIG.ENDPOINTS.USER.ALL_USERS, {
           headers: {
-            Authorization: `Bearer ${token}`,
             ...API_CONFIG.AXIOS_CONFIG.headers,
           },
+          // Don't send Authorization header, rely on cookies only
         });
         
         setAllUsers(response.data);
@@ -31,6 +32,8 @@ function useGetAllUsers() {
         console.log(`✅ Fetched ${response.data.length} users`);
       } catch (error) {
         console.error("❌ Error in useGetAllUsers:", error);
+        console.error("❌ Error response:", error.response?.data);
+        console.error("❌ Error status:", error.response?.status);
         setLoading(false);
         if (error.response?.status === 401) {
           console.log("🔐 Authentication required - redirecting to login");
