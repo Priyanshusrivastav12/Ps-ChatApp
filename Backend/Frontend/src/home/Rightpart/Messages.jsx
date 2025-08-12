@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import Message from "./Message";
 import useGetMessage from "../../context/useGetMessage.js";
-import Loading from "../../components/Loading.jsx";
+import LoadingDots from "../../components/LoadingDots.jsx";
 import useGetSocketMessage from "../../context/useGetSocketMessage.js";
 
 const Messages = forwardRef((props, ref) => {
@@ -60,7 +60,10 @@ const Messages = forwardRef((props, ref) => {
       <div className="relative z-10">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <Loading />
+            <div className="glass-effect p-6 rounded-xl">
+              <LoadingDots size="medium" />
+              <p className="text-gray-300 text-sm mt-3 text-center">Loading messages...</p>
+            </div>
           </div>
         ) : (
           messages.length > 0 &&

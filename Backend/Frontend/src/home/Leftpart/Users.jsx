@@ -1,6 +1,7 @@
 import React from "react";
 import User from "./User";
 import useGetAllUsers from "../../context/useGetAllUsers";
+import LoadingDots from "../../components/LoadingDots";
 
 function Users() {
   const [allUsers, loading] = useGetAllUsers();
@@ -20,11 +21,12 @@ function Users() {
           ))}
         </div>
         
-        {/* Loading state with glassmorphism */}
+        {/* Loading state with small loading dots */}
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center z-20">
-            <div className="glass-effect p-6 rounded-xl">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="glass-effect p-4 rounded-xl">
+              <LoadingDots size="medium" />
+              <p className="text-gray-300 text-xs mt-2 text-center">Loading users...</p>
             </div>
           </div>
         )}

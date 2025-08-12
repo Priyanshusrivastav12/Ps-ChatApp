@@ -21,24 +21,28 @@ function Typesend() {
   const emojiPickerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Common emojis for quick access
-  const emojis = [
-    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
-    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
-    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩",
-    "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣",
-    "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬",
-    "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗",
-    "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯",
-    "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐",
-    "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈",
-    "👍", "👎", "👌", "🤞", "✌️", "🤟", "🤘", "🤙", "👈", "👉",
-    "👆", "🖕", "👇", "☝️", "👋", "🤚", "🖐️", "✋", "🖖", "👏",
-    "🙌", "🤲", "🤝", "🙏", "✍️", "💪", "🦾", "🦿", "🦵", "🦶",
-    "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
-    "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "☮️",
-    "✨", "🎉", "🎊", "🎈", "🎁", "🏆", "🥇", "🌟", "⭐", "💫"
-  ];
+  // Common emojis organized by categories
+  const emojiCategories = {
+    "Smileys & People": [
+      "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+      "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
+      "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩"
+    ],
+    "Hearts & Love": [
+      "❤️", "�", "�", "�", "�", "�", "�", "�", "�", "�",
+      "❣️", "�", "�", "�", "�", "�", "�", "�", "�", "☮️"
+    ],
+    "Hands & Gestures": [
+      "👍", "👎", "👌", "🤞", "✌️", "🤟", "🤘", "🤙", "👈", "👉",
+      "👆", "👇", "☝️", "👋", "🤚", "🖐️", "✋", "🖖", "👏", "🙌"
+    ],
+    "Celebrations": [
+      "✨", "🎉", "🎊", "🎈", "🎁", "🏆", "🥇", "🌟", "⭐", "�",
+      "🎀", "🎗️", "🎟️", "🎫", "🎪", "🎭", "🎨", "🎬", "🎤", "🎧"
+    ]
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState("Smileys & People");
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -114,6 +118,31 @@ function Typesend() {
     }, 1000);
     
     setTypingTimeout(timeout);
+  };
+
+  const handleKeyDown = (e) => {
+    // Ctrl/Cmd + Enter to send message
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+    
+    // Escape to close emoji picker
+    if (e.key === 'Escape') {
+      setShowEmojiPicker(false);
+    }
+    
+    // Ctrl/Cmd + Z for undo
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      handleUndo();
+    }
+    
+    // Ctrl/Cmd + K to clear
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      handleClear();
+    }
   };
 
   const handleEmojiClick = (emoji) => {
@@ -206,21 +235,47 @@ function Typesend() {
                 id="message-input"
                 name="message"
                 type="text"
-                placeholder={replyingTo ? "Reply to message..." : "Type your message..."}
+                placeholder={replyingTo ? "Reply to message..." : "Type your message... (Ctrl+Enter to send)"}
                 value={message}
                 onChange={handleChange}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 pr-12 sm:pr-16 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 rounded-xl sm:rounded-2xl outline-none text-white placeholder-gray-400 transition-all duration-300 focus:border-blue-500/70 focus:shadow-lg focus:shadow-blue-500/25 group-hover:border-slate-500/70 text-sm sm:text-base"
+                onKeyDown={handleKeyDown}
+                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 pr-20 sm:pr-24 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 rounded-xl sm:rounded-2xl outline-none text-white placeholder-gray-400 transition-all duration-300 focus:border-blue-500/70 focus:shadow-lg focus:shadow-blue-500/25 group-hover:border-slate-500/70 text-sm sm:text-base input-enhanced"
               />
               
               {/* Input glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-green-500/10 rounded-xl sm:rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               
-              {/* Character count indicator - hidden on small screens */}
-              {message.length > 0 && (
-                <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 hidden sm:block">
-                  {message.length}
-                </div>
-              )}
+              {/* Inline input buttons */}
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                {/* Character count indicator */}
+                {message.length > 0 && (
+                  <span className="text-xs text-gray-400 hidden sm:block mr-2">
+                    {message.length}
+                  </span>
+                )}
+                
+                {/* Emoji button (inline) */}
+                <button
+                  type="button"
+                  onClick={toggleEmojiPicker}
+                  className="p-1.5 text-yellow-400 hover:text-yellow-300 hover:bg-gray-700/50 rounded-lg transition-all duration-200"
+                  title="Add emoji"
+                >
+                  <BsEmojiSmile className="text-sm" />
+                </button>
+                
+                {/* Clear button (inline) - only show when there's text */}
+                {message.trim() && (
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-gray-700/50 rounded-lg transition-all duration-200"
+                    title="Clear"
+                  >
+                    <MdClose className="text-sm" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -230,20 +285,10 @@ function Typesend() {
             <button
               type="button"
               onClick={() => setShowFileUpload(true)}
-              className="p-3 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 text-purple-400 hover:text-purple-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 group"
+              className="p-2 sm:p-3 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 text-purple-400 hover:text-purple-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 group"
               title="Attach file"
             >
-              <IoAttach className="text-xl group-hover:scale-110 transition-transform duration-300" />
-            </button>
-
-            {/* Emoji button */}
-            <button
-              type="button"
-              onClick={toggleEmojiPicker}
-              className="p-3 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 text-yellow-400 hover:text-yellow-300 hover:border-yellow-500/50 hover:shadow-lg hover:shadow-yellow-500/25 transition-all duration-300 group"
-              title="Add emoji"
-            >
-              <BsEmojiSmile className="text-xl group-hover:scale-110 transition-transform duration-300" />
+              <IoAttach className="text-lg sm:text-xl group-hover:scale-110 transition-transform duration-300" />
             </button>
 
             {/* Undo button */}
@@ -251,78 +296,85 @@ function Typesend() {
               type="button"
               onClick={handleUndo}
               disabled={historyIndex === 0}
-              className={`p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
+              className={`p-2 sm:p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
                 historyIndex === 0 
                   ? 'bg-slate-800/50 border-slate-600/30 text-gray-500 cursor-not-allowed' 
                   : 'bg-slate-800/80 border-slate-600/50 text-blue-400 hover:text-blue-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/25'
               }`}
               title="Undo"
             >
-              <MdUndo className="text-xl" />
-            </button>
-
-            {/* Clear button */}
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={!message.trim()}
-              className={`p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
-                !message.trim() 
-                  ? 'bg-slate-800/50 border-slate-600/30 text-gray-500 cursor-not-allowed' 
-                  : 'bg-slate-800/80 border-slate-600/50 text-red-400 hover:text-red-300 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/25'
-              }`}
-              title="Clear"
-            >
-              <MdClear className="text-xl" />
+              <MdUndo className="text-lg sm:text-xl" />
             </button>
 
             {/* Send button */}
             <button
               type="submit"
               disabled={!message.trim() || loading}
-              className={`p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
+              className={`p-2 sm:p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
                 !message.trim() || loading
                   ? 'bg-slate-800/50 border-slate-600/30 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-600 to-green-500 border-green-500/50 text-white hover:from-green-500 hover:to-green-400 hover:shadow-lg hover:shadow-green-500/25 transform hover:scale-105'
               }`}
               title="Send message"
             >
-              <IoSend className={`text-xl ${loading ? 'animate-pulse' : ''}`} />
+              <IoSend className={`text-lg sm:text-xl ${loading ? 'animate-pulse' : ''}`} />
             </button>
           </div>
         </div>
       </form>
 
-      {/* Enhanced Emoji Picker - Mobile Responsive */}
+      {/* Enhanced Emoji Picker with Categories - Mobile Responsive */}
       {showEmojiPicker && (
         <div 
           ref={emojiPickerRef}
-          className="absolute bottom-full right-2 sm:right-4 mb-2 glass-effect border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-6 w-72 sm:max-w-md z-50 animate-fadeInUp"
+          className="absolute bottom-full right-2 sm:right-4 mb-2 glass-effect border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl w-80 sm:w-96 z-50 animate-fadeInUp"
         >
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
+          {/* Header */}
+          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-white/10">
             <h3 className="text-white font-medium flex items-center text-sm sm:text-base">
               <span className="mr-2">😊</span>
-              Emojis
+              Emoji Picker
             </h3>
             <button
               onClick={() => setShowEmojiPicker(false)}
               className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
             >
-              ✕
+              <MdClose className="text-lg" />
             </button>
           </div>
-          <div className="grid grid-cols-8 sm:grid-cols-10 gap-1 sm:gap-2 max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar">
-            {emojis.map((emoji, index) => (
+          
+          {/* Category Tabs */}
+          <div className="flex space-x-1 p-2 bg-black/20 border-b border-white/10 overflow-x-auto">
+            {Object.keys(emojiCategories).map((category) => (
               <button
-                key={index}
-                type="button"
-                onClick={() => handleEmojiClick(emoji)}
-                className="text-lg sm:text-2xl hover:bg-white/10 rounded-lg p-1 sm:p-2 transition-all duration-200 focus:outline-none focus:bg-white/20 hover:scale-110 transform"
-                title={emoji}
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-3 py-1 rounded-lg text-xs whitespace-nowrap transition-all ${
+                  selectedCategory === category
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
               >
-                {emoji}
+                {category}
               </button>
             ))}
+          </div>
+          
+          {/* Emoji Grid */}
+          <div className="p-3 max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar">
+            <div className="grid grid-cols-8 sm:grid-cols-10 gap-1 sm:gap-2">
+              {emojiCategories[selectedCategory].map((emoji, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => handleEmojiClick(emoji)}
+                  className="text-lg sm:text-2xl hover:bg-white/10 rounded-lg p-1 sm:p-2 transition-all duration-200 focus:outline-none focus:bg-white/20 hover:scale-110 transform"
+                  title={emoji}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
