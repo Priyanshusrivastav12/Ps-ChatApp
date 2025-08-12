@@ -7,6 +7,7 @@ import { useAuth } from "./context/AuthProvider";
 import { Toaster } from "react-hot-toast";
 
 import { Navigate, Route, Routes } from "react-router-dom";
+
 function App() {
   const [authUser, setAuthUser] = useAuth();
   console.log(authUser);
@@ -17,29 +18,38 @@ function App() {
           path="/"
           element={
             authUser ? (
-              // <div className="flex h-screen">
-              //   <Left />
-              //   <Right />
-              // </div>
-              <div className="drawer lg:drawer-open">
+              <div className="drawer lg:drawer-open h-screen">
                 <input
                   id="my-drawer-2"
                   name="drawer-toggle"
                   type="checkbox"
                   className="drawer-toggle"
                 />
-                <div className="drawer-content flex flex-col items-center justify-center">
+                
+                {/* Main content area */}
+                <div className="drawer-content flex flex-col h-screen overflow-hidden">
                   <Right />
                 </div>
-                <div className="drawer-side">
+                
+                {/* Sidebar */}
+                <div className="drawer-side z-50">
                   <label
                     htmlFor="my-drawer-2"
                     aria-label="close sidebar"
                     className="drawer-overlay"
                   ></label>
-                  <ul className="menu w-80 min-h-full bg-black text-base-content">
+                  <div className="min-h-full w-80 bg-black text-base-content relative">
+                    {/* Mobile close button */}
+                    <div className="lg:hidden absolute top-4 right-4 z-10">
+                      <label
+                        htmlFor="my-drawer-2"
+                        className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/10"
+                      >
+                        ✕
+                      </label>
+                    </div>
                     <Left />
-                  </ul>
+                  </div>
                 </div>
               </div>
             ) : (

@@ -2,8 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbars */
 .flex-1::-webkit-scrollbar {
   display: none;
+}
+
+/* Mobile viewport fix */
+@supports (-webkit-touch-callout: none) {
+  .mobile-viewport-fix {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Mobile touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  .hover\\:scale-102:hover {
+    transform: none;
+  }
+  
+  .hover\\:scale-105:hover {
+    transform: none;
+  }
+  
+  /* Reduce animation on mobile for better performance */
+  .animate-bounce,
+  .animate-pulse,
+  .animate-spin {
+    animation-duration: 2s;
+  }
+}
+
+/* Better mobile tap targets */
+@media (max-width: 768px) {
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* Custom Scrollbar */
