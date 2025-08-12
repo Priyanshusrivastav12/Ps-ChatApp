@@ -35,13 +35,25 @@ function Right() {
           <div className="relative">
             <Chatuser />
             {selectedConversation && (
-              <button
-                onClick={() => setShowSearch(true)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors lg:block hidden"
-                title="Search messages"
-              >
-                <IoSearch className="text-lg" />
-              </button>
+              <>
+                {/* Desktop search button */}
+                <button
+                  onClick={() => setShowSearch(true)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors hidden lg:block z-20"
+                  title="Search messages"
+                >
+                  <IoSearch className="text-lg" />
+                </button>
+                
+                {/* Mobile search button - positioned to avoid overlap */}
+                <button
+                  onClick={() => setShowSearch(true)}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors lg:hidden z-20 w-10 h-10 flex items-center justify-center"
+                  title="Search messages"
+                >
+                  <IoSearch className="text-base" />
+                </button>
+              </>
             )}
           </div>
           

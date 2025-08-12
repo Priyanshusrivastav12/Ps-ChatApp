@@ -175,29 +175,29 @@ function Typesend() {
       {/* Background with subtle animation */}
       <div className="absolute inset-0 glass-effect border-t border-white/10"></div>
       
-      {/* Reply Preview */}
+      {/* Reply Preview - Mobile Responsive */}
       {replyingTo && (
-        <div className="relative z-10 px-4 py-2 bg-gray-800/50 border-t border-gray-600/50">
+        <div className="relative z-10 px-3 sm:px-4 py-2 bg-gray-800/50 border-t border-gray-600/50">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
-              <div>
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+              <div className="w-1 h-6 sm:h-8 bg-blue-500 rounded-full flex-shrink-0"></div>
+              <div className="min-w-0 flex-1">
                 <p className="text-xs text-blue-400 font-medium">Replying to:</p>
-                <p className="text-sm text-gray-300 truncate max-w-xs">{replyingTo.message}</p>
+                <p className="text-xs sm:text-sm text-gray-300 truncate">{replyingTo.message}</p>
               </div>
             </div>
             <button
               onClick={cancelReply}
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-white transition-colors p-1 flex-shrink-0"
             >
-              <MdClose className="text-lg" />
+              <MdClose className="text-base sm:text-lg" />
             </button>
           </div>
         </div>
       )}
       
       <form onSubmit={handleSubmit} className="relative z-10">
-        <div className="flex space-x-3 h-[8vh] px-4 py-2">
+        <div className="flex space-x-2 sm:space-x-3 h-auto sm:h-[8vh] px-3 sm:px-4 py-3 sm:py-2">
           {/* Input container with enhanced styling */}
           <div className="flex-1 relative">
             <div className="relative group">
@@ -209,23 +209,23 @@ function Typesend() {
                 placeholder={replyingTo ? "Reply to message..." : "Type your message..."}
                 value={message}
                 onChange={handleChange}
-                className="w-full px-6 py-3 pr-16 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 rounded-2xl outline-none text-white placeholder-gray-400 transition-all duration-300 focus:border-blue-500/70 focus:shadow-lg focus:shadow-blue-500/25 group-hover:border-slate-500/70"
+                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 pr-12 sm:pr-16 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 rounded-xl sm:rounded-2xl outline-none text-white placeholder-gray-400 transition-all duration-300 focus:border-blue-500/70 focus:shadow-lg focus:shadow-blue-500/25 group-hover:border-slate-500/70 text-sm sm:text-base"
               />
               
               {/* Input glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-green-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-green-500/10 rounded-xl sm:rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               
-              {/* Character count indicator */}
+              {/* Character count indicator - hidden on small screens */}
               {message.length > 0 && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+                <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 hidden sm:block">
                   {message.length}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Action buttons container */}
-          <div className="flex items-center space-x-2">
+          {/* Action buttons container - responsive */}
+          <div className="flex items-center space-x-1 sm:space-x-2">
             {/* File attachment button */}
             <button
               type="button"
@@ -293,14 +293,14 @@ function Typesend() {
         </div>
       </form>
 
-      {/* Enhanced Emoji Picker */}
+      {/* Enhanced Emoji Picker - Mobile Responsive */}
       {showEmojiPicker && (
         <div 
           ref={emojiPickerRef}
-          className="absolute bottom-full right-4 mb-2 glass-effect border border-white/20 rounded-2xl shadow-2xl p-6 max-w-md z-50 animate-fadeInUp"
+          className="absolute bottom-full right-2 sm:right-4 mb-2 glass-effect border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-6 w-72 sm:max-w-md z-50 animate-fadeInUp"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-white font-medium flex items-center">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-white font-medium flex items-center text-sm sm:text-base">
               <span className="mr-2">😊</span>
               Emojis
             </h3>
@@ -311,13 +311,13 @@ function Typesend() {
               ✕
             </button>
           </div>
-          <div className="grid grid-cols-10 gap-2 max-h-64 overflow-y-auto custom-scrollbar">
+          <div className="grid grid-cols-8 sm:grid-cols-10 gap-1 sm:gap-2 max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar">
             {emojis.map((emoji, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => handleEmojiClick(emoji)}
-                className="text-2xl hover:bg-white/10 rounded-lg p-2 transition-all duration-200 focus:outline-none focus:bg-white/20 hover:scale-110 transform"
+                className="text-lg sm:text-2xl hover:bg-white/10 rounded-lg p-1 sm:p-2 transition-all duration-200 focus:outline-none focus:bg-white/20 hover:scale-110 transform"
                 title={emoji}
               >
                 {emoji}

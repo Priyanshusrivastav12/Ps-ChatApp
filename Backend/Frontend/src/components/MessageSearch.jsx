@@ -108,11 +108,11 @@ function MessageSearch({ messages, onResultClick, isOpen, onClose }) {
 
   return (
     <div className="absolute top-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-b border-gray-700 z-50">
-      <div className="p-4 space-y-4">
+      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
         {/* Search Input */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="flex-1 relative">
-            <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+            <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-base sm:text-lg" />
             <input
               ref={searchInputRef}
               type="text"
@@ -120,37 +120,37 @@ function MessageSearch({ messages, onResultClick, isOpen, onClose }) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:bg-gray-750"
+              className="w-full pl-10 pr-4 py-2 sm:py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:bg-gray-750 text-sm sm:text-base"
             />
             {isSearching && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-blue-500 border-t-transparent"></div>
               </div>
             )}
           </div>
           
-          {/* Navigation buttons */}
+          {/* Navigation buttons - responsive */}
           <div className="flex items-center space-x-1">
             <button
               onClick={() => navigateResults('prev')}
               disabled={searchResults.length === 0}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Previous result"
             >
-              <MdKeyboardArrowUp className="text-lg" />
+              <MdKeyboardArrowUp className="text-base sm:text-lg" />
             </button>
             <button
               onClick={() => navigateResults('next')}
               disabled={searchResults.length === 0}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Next result"
             >
-              <MdKeyboardArrowDown className="text-lg" />
+              <MdKeyboardArrowDown className="text-base sm:text-lg" />
             </button>
           </div>
           
-          {/* Results counter */}
-          <div className="text-sm text-gray-400 min-w-max">
+          {/* Results counter - responsive text */}
+          <div className="text-xs sm:text-sm text-gray-400 min-w-max hidden sm:block">
             {searchResults.length > 0 ? (
               `${currentResultIndex + 1} of ${searchResults.length}`
             ) : searchTerm ? (
@@ -160,24 +160,31 @@ function MessageSearch({ messages, onResultClick, isOpen, onClose }) {
             )}
           </div>
           
+          {/* Mobile results counter */}
+          <div className="text-xs text-gray-400 sm:hidden">
+            {searchResults.length > 0 && (
+              `${currentResultIndex + 1}/${searchResults.length}`
+            )}
+          </div>
+          
           {/* Close button */}
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
             title="Close search"
           >
-            <IoClose className="text-lg" />
+            <IoClose className="text-base sm:text-lg" />
           </button>
         </div>
 
-        {/* Search Results Preview */}
+        {/* Search Results Preview - Mobile optimized */}
         {searchTerm && searchResults.length > 0 && (
-          <div className="max-h-40 overflow-y-auto space-y-2 custom-scrollbar">
+          <div className="max-h-32 sm:max-h-40 overflow-y-auto space-y-2 custom-scrollbar">
             {searchResults.slice(0, 5).map((result, index) => (
               <div
                 key={result._id}
                 onClick={() => onResultClick(result)}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                className={`p-2 sm:p-3 rounded-lg cursor-pointer transition-colors ${
                   index === currentResultIndex
                     ? 'bg-blue-600/30 border border-blue-500/50'
                     : 'bg-gray-800/50 hover:bg-gray-700/50'
@@ -185,7 +192,7 @@ function MessageSearch({ messages, onResultClick, isOpen, onClose }) {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm truncate">
+                    <p className="text-white text-xs sm:text-sm break-words leading-relaxed">
                       {highlightText(result.message, searchTerm)}
                     </p>
                     <p className="text-gray-400 text-xs mt-1">
@@ -193,13 +200,13 @@ function MessageSearch({ messages, onResultClick, isOpen, onClose }) {
                     </p>
                   </div>
                   {index === currentResultIndex && (
-                    <div className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="ml-2 w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
                   )}
                 </div>
               </div>
             ))}
             {searchResults.length > 5 && (
-              <div className="text-center text-gray-400 text-sm py-2">
+              <div className="text-center text-gray-400 text-xs sm:text-sm py-2">
                 And {searchResults.length - 5} more results...
               </div>
             )}

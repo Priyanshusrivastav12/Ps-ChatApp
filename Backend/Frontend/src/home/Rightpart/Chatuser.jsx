@@ -39,25 +39,27 @@ function Chatuser() {
 
   return (
     <div className="relative glass-effect border-b border-white/10 shadow-lg">
+      {/* Mobile menu button - positioned to avoid overlap */}
       <label
         htmlFor="my-drawer-2"
-        className="btn btn-ghost drawer-button lg:hidden absolute left-5 top-1/2 transform -translate-y-1/2 z-20 glass-effect"
+        className="btn btn-ghost drawer-button lg:hidden absolute left-2 top-1/2 transform -translate-y-1/2 z-30 glass-effect w-10 h-10 min-h-10 p-2"
       >
-        <CiMenuFries className="text-white text-xl" />
+        <CiMenuFries className="text-white text-lg" />
       </label>
       
-      <div className="flex items-center justify-center h-[8vh] px-6 relative overflow-hidden">
+      <div className="flex items-center justify-center h-[8vh] px-4 sm:px-6 relative overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50"></div>
         
         {/* Animated accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60"></div>
         
-        <div className="flex items-center space-x-4 relative z-10">
+        {/* Mobile: Left padding to avoid menu button overlap */}
+        <div className="flex items-center space-x-3 sm:space-x-4 relative z-10 w-full lg:pl-0 pl-12 pr-2">
           {/* Avatar with enhanced styling */}
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <div className={`avatar ${isOnline ? "online" : ""}`}>
-              <div className="w-14 rounded-full ring-2 ring-blue-400/30 ring-offset-2 ring-offset-transparent transition-all duration-300">
+              <div className="w-10 sm:w-12 lg:w-14 rounded-full ring-2 ring-blue-400/30 ring-offset-2 ring-offset-transparent transition-all duration-300">
                 <img src={profile} alt={selectedConversation.fullname} className="rounded-full" />
               </div>
             </div>
@@ -79,18 +81,18 @@ function Chatuser() {
             )}
           </div>
           
-          {/* User info */}
-          <div className="flex-1">
-            <h1 className="text-xl font-semibold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text">
+          {/* User info - responsive text sizing */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text truncate">
               {selectedConversation.fullname}
             </h1>
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              <div className={`w-2 h-2 rounded-full transition-all duration-300 flex-shrink-0 ${
                 isOnline 
                   ? "bg-green-400 shadow-lg shadow-green-400/50 animate-pulse" 
                   : "bg-gray-500"
               }`}></div>
-              <span className={`text-sm transition-colors duration-300 ${
+              <span className={`text-xs sm:text-sm transition-colors duration-300 truncate ${
                 isTyping 
                   ? "text-blue-400 animate-pulse" 
                   : isOnline 
@@ -102,8 +104,8 @@ function Chatuser() {
             </div>
           </div>
           
-          {/* Activity indicator */}
-          <div className="flex flex-col items-center space-y-1">
+          {/* Activity indicator - hidden on small screens to save space */}
+          <div className="hidden sm:flex flex-col items-center space-y-1 flex-shrink-0">
             <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
               isOnline ? "bg-green-400 animate-pulse" : "bg-gray-500"
             }`}></div>
