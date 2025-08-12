@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IoSend } from "react-icons/io5";
+import { IoSend, IoAttach } from "react-icons/io5";
 import { BsEmojiSmile } from "react-icons/bs";
-import { MdUndo, MdClear } from "react-icons/md";
+import { MdUndo, MdClear, MdClose } from "react-icons/md";
 import useSendMessage from "../../context/useSendMessage.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import useConversation from "../../zustand/useConversation.js";
+import FileUpload from "../../components/FileUpload.jsx";
 
 function Typesend() {
   const [message, setMessage] = useState("");
   const [messageHistory, setMessageHistory] = useState([""]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
   const { loading, sendMessages } = useSendMessage();
   const { socket } = useSocketContext();
   const { selectedConversation } = useConversation();
@@ -51,6 +54,22 @@ function Typesend() {
     };
   }, []);
 
+  // Listen for reply events
+  useEffect(() => {
+    const handleReply = (messageToReply) => {
+      setReplyingTo(messageToReply);
+      inputRef.current?.focus();
+    };
+
+    // In a real implementation, you'd listen to a context or prop for reply events
+    // For now, we'll expose this function globally for the Message component to use
+    window.handleReplyToMessage = handleReply;
+
+    return () => {
+      delete window.handleReplyToMessage;
+    };
+  }, []);
+
   // Update message history when message changes
   useEffect(() => {
     if (historyIndex === messageHistory.length - 1) {
@@ -63,13 +82,20 @@ function Typesend() {
     e.preventDefault();
     if (message.trim()) {
       socket?.emit("stopTyping", { recipientId: selectedConversation._id });
-      await sendMessages(message);
+      
+      const messageData = {
+        message: message.trim(),
+        replyTo: replyingTo?._id || null
+      };
+      
+      await sendMessages(messageData);
       
       // Add sent message to history and reset
       const newHistory = [...messageHistory, ""];
       setMessageHistory(newHistory);
       setHistoryIndex(newHistory.length - 1);
       setMessage("");
+      setReplyingTo(null);
     }
   };
 
@@ -105,6 +131,21 @@ function Typesend() {
     }, 0);
   };
 
+  const handleFileSelect = async (fileData) => {
+    // In a real implementation, you would upload the file to your server
+    // and get a URL back. For now, we'll simulate this.
+    const messageData = {
+      message: fileData.name,
+      messageType: fileData.type,
+      fileUrl: fileData.preview || URL.createObjectURL(fileData.file),
+      fileName: fileData.name,
+      fileSize: fileData.size
+    };
+    
+    await sendMessages(messageData);
+    setShowFileUpload(false);
+  };
+
   const handleUndo = () => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
@@ -125,10 +166,35 @@ function Typesend() {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
+  const cancelReply = () => {
+    setReplyingTo(null);
+  };
+
   return (
     <div className="relative">
       {/* Background with subtle animation */}
       <div className="absolute inset-0 glass-effect border-t border-white/10"></div>
+      
+      {/* Reply Preview */}
+      {replyingTo && (
+        <div className="relative z-10 px-4 py-2 bg-gray-800/50 border-t border-gray-600/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
+              <div>
+                <p className="text-xs text-blue-400 font-medium">Replying to:</p>
+                <p className="text-sm text-gray-300 truncate max-w-xs">{replyingTo.message}</p>
+              </div>
+            </div>
+            <button
+              onClick={cancelReply}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <MdClose className="text-lg" />
+            </button>
+          </div>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit} className="relative z-10">
         <div className="flex space-x-3 h-[8vh] px-4 py-2">
@@ -140,7 +206,7 @@ function Typesend() {
                 id="message-input"
                 name="message"
                 type="text"
-                placeholder="Type your message..."
+                placeholder={replyingTo ? "Reply to message..." : "Type your message..."}
                 value={message}
                 onChange={handleChange}
                 className="w-full px-6 py-3 pr-16 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 rounded-2xl outline-none text-white placeholder-gray-400 transition-all duration-300 focus:border-blue-500/70 focus:shadow-lg focus:shadow-blue-500/25 group-hover:border-slate-500/70"
@@ -160,6 +226,16 @@ function Typesend() {
 
           {/* Action buttons container */}
           <div className="flex items-center space-x-2">
+            {/* File attachment button */}
+            <button
+              type="button"
+              onClick={() => setShowFileUpload(true)}
+              className="p-3 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 text-purple-400 hover:text-purple-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 group"
+              title="Attach file"
+            >
+              <IoAttach className="text-xl group-hover:scale-110 transition-transform duration-300" />
+            </button>
+
             {/* Emoji button */}
             <button
               type="button"
@@ -249,6 +325,14 @@ function Typesend() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* File Upload Modal */}
+      {showFileUpload && (
+        <FileUpload
+          onFileSelect={handleFileSelect}
+          onCancel={() => setShowFileUpload(false)}
+        />
       )}
     </div>
   );

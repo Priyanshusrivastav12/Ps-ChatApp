@@ -1,26 +1,64 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Chatuser from "./Chatuser";
 import Messages from "./Messages";
 import Typesend from "./Typesend";
+import MessageSearch from "../../components/MessageSearch";
 import useConversation from "../../zustand/useConversation.js";
 import { useAuth } from "../../context/AuthProvider.jsx";
 import { CiMenuFries } from "react-icons/ci";
+import { IoSearch } from "react-icons/io5";
 
 function Right() {
-  const { selectedConversation, setSelectedConversation } = useConversation();
+  const { selectedConversation, setSelectedConversation, messages } = useConversation();
+  const [showSearch, setShowSearch] = useState(false);
+  const messagesRef = useRef(null);
+  
   useEffect(() => {
     return setSelectedConversation(null);
   }, [setSelectedConversation]);
+
+  const handleSearchResult = (message) => {
+    // Scroll to the message in the chat
+    if (messagesRef.current) {
+      messagesRef.current.scrollToMessage(message._id);
+    }
+    setShowSearch(false);
+  };
+
   return (
     <div className="w-full h-screen bg-slate-900 text-gray-300 relative overflow-hidden flex flex-col">
       {!selectedConversation ? (
         <NoChatSelected />
       ) : (
         <>
-          <Chatuser />
-          <div className="flex-1 overflow-y-auto">
-            <Messages />
+          {/* Chat Header with Search */}
+          <div className="relative">
+            <Chatuser />
+            {selectedConversation && (
+              <button
+                onClick={() => setShowSearch(true)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors lg:block hidden"
+                title="Search messages"
+              >
+                <IoSearch className="text-lg" />
+              </button>
+            )}
           </div>
+          
+          {/* Message Search Overlay */}
+          <MessageSearch
+            messages={messages}
+            onResultClick={handleSearchResult}
+            isOpen={showSearch}
+            onClose={() => setShowSearch(false)}
+          />
+          
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto">
+            <Messages ref={messagesRef} />
+          </div>
+          
+          {/* Message Input */}
           <Typesend />
         </>
       )}

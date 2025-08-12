@@ -10,6 +10,11 @@ import userRoute from "./routes/user.route.js";
 import messageRoute from "./routes/message.route.js";
 import { app, server } from "./SocketIO/server.js";
 
+// Import models to ensure they're registered
+import "./models/user.model.js";
+import "./models/message.model.js";
+import "./models/conversation.model.js";
+
 // Load environment variables based on NODE_ENV
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
 dotenv.config({ path: envFile });
@@ -38,18 +43,29 @@ console.log(`📡 Backend URL: ${BACKEND_URL}`);
 console.log(`🌐 Frontend URL: ${FRONTEND_URL}`);
 
 // middleware
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 
-// Dynamic CORS configuration - Allow all origins
+// Dynamic CORS configuration - Allow all origins and specific frontend URLs
 const corsOptions = {
-  origin: true, // Allow all origins
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174', 
+    'http://localhost:5175',
+    'http://localhost:3000',
+    FRONTEND_URL
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // Environment-specific CSP headers
 if (NODE_ENV !== "production") {

@@ -12,13 +12,13 @@ const useSendMessage = () => {
   const [loading, setLoading] = useState(false);
   const { messages, setMessage, selectedConversation } = useConversation();
   
-  const sendMessages = async (message) => {
+  const sendMessages = async (messageData) => {
     setLoading(true);
     try {
       const endpoint = API_CONFIG.ENDPOINTS.MESSAGE.SEND(selectedConversation._id);
       console.log(`📤 Sending message to: ${API_CONFIG.BASE_URL}${endpoint}`);
       
-      const res = await axios.post(endpoint, { message });
+      const res = await axios.post(endpoint, messageData);
       setMessage([...messages, res.data]);
       setLoading(false);
       console.log("✅ Message sent successfully");

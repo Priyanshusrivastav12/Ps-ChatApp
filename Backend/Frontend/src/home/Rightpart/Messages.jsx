@@ -1,15 +1,42 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import Message from "./Message";
 import useGetMessage from "../../context/useGetMessage.js";
 import Loading from "../../components/Loading.jsx";
 import useGetSocketMessage from "../../context/useGetSocketMessage.js";
 
-function Messages() {
+const Messages = forwardRef((props, ref) => {
   const { loading, messages } = useGetMessage();
   useGetSocketMessage(); // listing incoming messages
   console.log(messages);
 
   const lastMsgRef = useRef();
+  const messagesContainerRef = useRef();
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    scrollToMessage: (messageId) => {
+      const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+      if (messageElement) {
+        messageElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+        // Highlight the message briefly
+        messageElement.classList.add('search-highlight');
+        setTimeout(() => {
+          messageElement.classList.remove('search-highlight');
+        }, 2000);
+      }
+    },
+    scrollToBottom: () => {
+      if (lastMsgRef.current) {
+        lastMsgRef.current.scrollIntoView({
+          behavior: "smooth",
+        });
+      }
+    }
+  }));
+
   useEffect(() => {
     setTimeout(() => {
       if (lastMsgRef.current) {
@@ -22,6 +49,7 @@ function Messages() {
   
   return (
     <div
+      ref={messagesContainerRef}
       className="flex-1 overflow-y-auto chat-messages-bg relative"
       style={{ minHeight: "calc(92vh - 8vh)" }}
     >
@@ -37,7 +65,7 @@ function Messages() {
         ) : (
           messages.length > 0 &&
           messages.map((message) => (
-            <div key={message._id} ref={lastMsgRef}>
+            <div key={message._id} ref={lastMsgRef} data-message-id={message._id}>
               <Message message={message} />
             </div>
           ))
@@ -58,6 +86,8 @@ function Messages() {
       </div>
     </div>
   );
-}
+});
+
+Messages.displayName = 'Messages';
 
 export default Messages;
