@@ -10,28 +10,13 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Dynamic CORS configuration for Socket.IO
-const getCorsConfig = () => {
-  // Get allowed origins from environment variables
-  const allowedOrigins = [FRONTEND_URL];
-  
-  // In development, also allow common localhost ports
-  if (NODE_ENV === 'development') {
-    allowedOrigins.push(
-      "http://localhost:3000",
-      "http://localhost:3001", 
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://127.0.0.1:5173",
-      "http://127.0.0.1:5174"
-    );
-  }
-  
+function getCorsConfig() {
   return {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: true, // Allow all origins
+    credentials: true,
+    methods: ['GET', 'POST'],
   };
-};
+}
 
 const io = new Server(server, {
   cors: getCorsConfig()

@@ -41,39 +41,9 @@ console.log(`🌐 Frontend URL: ${FRONTEND_URL}`);
 app.use(express.json());
 app.use(cookieParser());
 
-// Dynamic CORS configuration based on environment
+// Dynamic CORS configuration - Allow all origins
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Get allowed origins from environment variables
-    const allowedOrigins = [FRONTEND_URL];
-    
-    // In development, also allow common localhost ports
-    if (NODE_ENV === 'development') {
-      allowedOrigins.push(
-        'http://localhost:3000',
-        'http://localhost:3001', 
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:5174'
-      );
-    }
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    // In development, allow any localhost origin
-    if (NODE_ENV === 'development' && origin && origin.startsWith('http://localhost:')) {
-      return callback(null, true);
-    }
-    
-    console.warn(`❌ CORS blocked origin: ${origin}`);
-    return callback(new Error(`Not allowed by CORS. Origin: ${origin}`));
-  },
+  origin: true, // Allow all origins
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
