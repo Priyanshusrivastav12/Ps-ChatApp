@@ -11,28 +11,26 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Dynamic CORS configuration for Socket.IO
 const getCorsConfig = () => {
-  if (NODE_ENV === 'production') {
-    return {
-      origin: [
-        "https://ps-chatapp.onrender.com",
-        process.env.PRODUCTION_FRONTEND_URL
-      ].filter(Boolean),
-      methods: ["GET", "POST"],
-      credentials: true
-    };
-  } else {
-    return {
-      origin: [
-        "http://localhost:3000",
-        "http://localhost:3001", 
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        FRONTEND_URL
-      ].filter(Boolean),
-      methods: ["GET", "POST"],
-      credentials: true
-    };
+  // Get allowed origins from environment variables
+  const allowedOrigins = [FRONTEND_URL];
+  
+  // In development, also allow common localhost ports
+  if (NODE_ENV === 'development') {
+    allowedOrigins.push(
+      "http://localhost:3000",
+      "http://localhost:3001", 
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:5174"
+    );
   }
+  
+  return {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  };
 };
 
 const io = new Server(server, {

@@ -6,15 +6,8 @@ export default defineConfig(({ command, mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
   
-  // Determine API base URL based on environment
-  const getApiBaseUrl = () => {
-    if (mode === 'production') {
-      return env.VITE_API_BASE_URL || 'https://ps-chatapp.onrender.com';
-    }
-    return env.VITE_API_BASE_URL || 'http://localhost:4001';
-  };
-
-  const apiBaseUrl = getApiBaseUrl();
+  // Get API base URL from environment variable
+  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:4001';
 
   console.log(`🔧 Vite config loaded for ${mode} mode`);
   console.log(`📡 API Base URL: ${apiBaseUrl}`);
@@ -22,7 +15,7 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: 5173,
+      port: 5174,
       host: true, // Allow external connections
       proxy: {
         "/api": {
@@ -62,11 +55,6 @@ export default defineConfig(({ command, mode }) => {
       target: 'es2015',
     },
     base: '/',
-    define: {
-      // Make environment variables available to the app
-      __APP_ENV__: JSON.stringify(env.APP_ENV),
-      __API_BASE_URL__: JSON.stringify(apiBaseUrl),
-    },
     // Environment variable handling
     envPrefix: 'VITE_',
   };

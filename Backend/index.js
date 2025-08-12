@@ -47,25 +47,27 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    const allowedOrigins = NODE_ENV === 'production' 
-      ? [
-          'https://ps-chatapp.onrender.com',
-          process.env.PRODUCTION_FRONTEND_URL
-        ].filter(Boolean)
-      : [
-          'http://localhost:3000',
-          'http://localhost:3001', 
-          'http://localhost:5173',
-          'http://127.0.0.1:5173',
-          FRONTEND_URL
-        ].filter(Boolean);
+    // Get allowed origins from environment variables
+    const allowedOrigins = [FRONTEND_URL];
+    
+    // In development, also allow common localhost ports
+    if (NODE_ENV === 'development') {
+      allowedOrigins.push(
+        'http://localhost:3000',
+        'http://localhost:3001', 
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174'
+      );
+    }
     
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     
     // In development, allow any localhost origin
-    if (NODE_ENV !== 'production' && origin && origin.startsWith('http://localhost:')) {
+    if (NODE_ENV === 'development' && origin && origin.startsWith('http://localhost:')) {
       return callback(null, true);
     }
     

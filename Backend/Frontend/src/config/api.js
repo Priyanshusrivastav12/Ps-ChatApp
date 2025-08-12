@@ -1,23 +1,11 @@
 // API Configuration Helper
 // This file centralizes all API-related configuration
 
-const getEnvironment = () => {
-  return import.meta.env.VITE_NODE_ENV || 'development';
-};
-
 const getApiBaseUrl = () => {
-  const env = getEnvironment();
-  if (env === 'production') {
-    return import.meta.env.VITE_API_BASE_URL || 'https://ps-chatapp.onrender.com';
-  }
   return import.meta.env.VITE_API_BASE_URL || 'http://localhost:4001';
 };
 
 const getSocketUrl = () => {
-  const env = getEnvironment();
-  if (env === 'production') {
-    return import.meta.env.VITE_SOCKET_URL || 'https://ps-chatapp.onrender.com';
-  }
   return import.meta.env.VITE_SOCKET_URL || 'http://localhost:4001';
 };
 
@@ -25,7 +13,6 @@ const getSocketUrl = () => {
 export const API_CONFIG = {
   BASE_URL: getApiBaseUrl(),
   SOCKET_URL: getSocketUrl(),
-  ENVIRONMENT: getEnvironment(),
   
   // API Endpoints
   ENDPOINTS: {
@@ -59,9 +46,8 @@ export const API_CONFIG = {
 };
 
 // Debug information (only in development)
-if (API_CONFIG.ENVIRONMENT === 'development') {
+if (import.meta.env.DEV) {
   console.log('🔧 API Configuration:', {
-    environment: API_CONFIG.ENVIRONMENT,
     baseUrl: API_CONFIG.BASE_URL,
     socketUrl: API_CONFIG.SOCKET_URL,
   });

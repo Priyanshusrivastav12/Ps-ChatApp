@@ -40,13 +40,9 @@ MONGODB_URI="mongodb+srv://priyanshusrivastav548:Priyanshu@cluster0.rze7dxw.mong
 # JWT Configuration  
 JWT_SECRET=your_production_jwt_secret_key_here_make_it_very_secure_and_long
 
-# CORS Configuration
+# Application URLs
 FRONTEND_URL=https://ps-chatapp.onrender.com
 BACKEND_URL=https://ps-chatapp.onrender.com
-
-# Production URLs
-PRODUCTION_FRONTEND_URL=https://ps-chatapp.onrender.com
-PRODUCTION_BACKEND_URL=https://ps-chatapp.onrender.com
 EOF
     print_status ".env.production file created! Please update the values as needed."
 fi
@@ -65,11 +61,8 @@ if [ ! -f ".env.production" ]; then
     print_status "Creating frontend .env.production file..."
     cat > .env.production << 'EOF'
 # Frontend Environment Variables - Production
-VITE_NODE_ENV=production
 VITE_API_BASE_URL=https://ps-chatapp.onrender.com
 VITE_SOCKET_URL=https://ps-chatapp.onrender.com
-VITE_APP_NAME=ChatApp
-VITE_APP_VERSION=1.0.0
 EOF
 fi
 
