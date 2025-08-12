@@ -4,6 +4,13 @@ import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { API_CONFIG } from "../config/api.js";
+
+// Configure axios defaults
+axios.defaults.baseURL = API_CONFIG.BASE_URL;
+axios.defaults.withCredentials = true;
+axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
+
 function Signup() {
   const [authUser, setAuthUser] = useAuth();
   const {
@@ -16,7 +23,6 @@ function Signup() {
   // watch the password and confirm password fields
   const password = watch("password", "");
   const confirmPassword = watch("confirmPassword", "");
-  console.log(confirmPassword);
 
   const validatePasswordMatch = (value) => {
     return value === password || "Passwords do not match";
@@ -29,19 +35,26 @@ function Signup() {
       password: data.password,
       confirmPassword: data.confirmPassword,
     };
-    // console.log(userInfo);
+    
+    console.log(`🔐 Attempting signup to: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.SIGNUP}`);
+    
     await axios
-      .post("/api/user/signup", userInfo)
+      .post(API_CONFIG.ENDPOINTS.USER.SIGNUP, userInfo)
       .then((response) => {
         if (response.data) {
-          toast.success("Signup successful");
+          toast.success("✅ Signup successful");
         }
         localStorage.setItem("ChatApp", JSON.stringify(response.data));
         setAuthUser(response.data);
       })
       .catch((error) => {
+        console.error("❌ Signup error:", error);
         if (error.response) {
           toast.error("Error: " + error.response.data.error);
+        } else if (error.request) {
+          toast.error("Network error: Unable to connect to server");
+        } else {
+          toast.error("Signup failed: " + error.message);
         }
       });
   };

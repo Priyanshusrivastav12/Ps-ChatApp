@@ -2,16 +2,26 @@
 
 ## Common Issues and Solutions
 
-### 1. Frontend not loading on Render
+### 1. Frontend not loading on Render (Returns JSON instead of React App)
 
 **Symptoms:**
 - Backend API works (you can access `/api/` endpoints)
+- Main URL returns JSON like `{"message":"Chat App Backend Server is running!"}`
 - Frontend pages return 404 or don't load
 - Socket connections fail
 
 **Solutions:**
 
-#### A. Build Issues
+#### A. Environment Variable Issue
+The most common cause is `NODE_ENV` not being set to "production" on Render:
+
+1. Go to your Render dashboard
+2. Navigate to your service
+3. Go to Environment tab
+4. Add/verify: `NODE_ENV=production`
+5. Redeploy the service
+
+#### B. Build Issues
 1. Make sure your build script runs successfully:
    ```bash
    npm run build

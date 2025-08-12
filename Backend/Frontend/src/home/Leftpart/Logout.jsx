@@ -4,20 +4,37 @@ import { BiLogOutCircle } from "react-icons/bi";
 import axios from "axios";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+import { API_CONFIG } from "../../config/api.js";
+
+// Configure axios defaults
+axios.defaults.baseURL = API_CONFIG.BASE_URL;
+axios.defaults.withCredentials = true;
+axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
+
 function Logout() {
   const [loading, setLoading] = useState(false);
+  
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/api/user/logout");
+      console.log(`🚪 Attempting logout to: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.LOGOUT}`);
+      
+      const res = await axios.post(API_CONFIG.ENDPOINTS.USER.LOGOUT);
       localStorage.removeItem("ChatApp");
       Cookies.remove("jwt");
       setLoading(false);
-      toast.success("Logged out successfully");
+      toast.success("✅ Logged out successfully");
       window.location.reload();
     } catch (error) {
-      console.log("Error in Logout", error);
-      toast.error("Error in logging out");
+      console.error("❌ Logout error:", error);
+      setLoading(false);
+      if (error.response) {
+        toast.error("Error: " + error.response.data.error);
+      } else if (error.request) {
+        toast.error("Network error: Unable to connect to server");
+      } else {
+        toast.error("Logout failed: " + error.message);
+      }
     }
   };
   return (

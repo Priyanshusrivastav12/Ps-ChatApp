@@ -6,10 +6,16 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
+    "start": "NODE_ENV=production node index.js",
+    "start:dev": "NODE_ENV=development node index.js",
+    "start:prod": "NODE_ENV=production node index.js",
     "build": "npm install && npm install --prefix Frontend && npm run build --prefix Frontend",
-    "build:frontend": "cd Frontend && npm install && npm run build"
+    "build:frontend": "cd Frontend && npm install && npm run build",
+    "build:prod": "cd Frontend && npm install && npm run build:prod",
+    "setup": "npm install && cd Frontend && npm install",
+    "clean": "rm -rf node_modules Frontend/node_modules Frontend/dist",
+    "logs": "tail -f *.log"
   },
   "keywords": [
     "MERN"

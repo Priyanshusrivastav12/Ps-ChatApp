@@ -4,6 +4,12 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthProvider";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { API_CONFIG } from "../config/api.js";
+
+// Configure axios defaults
+axios.defaults.baseURL = API_CONFIG.BASE_URL;
+axios.defaults.withCredentials = true;
+axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
 
 function Login() {
   const [authUser, setAuthUser] = useAuth();
@@ -19,19 +25,26 @@ function Login() {
       email: data.email,
       password: data.password,
     };
-    // console.log(userInfo);
+    
+    console.log(`🔐 Attempting login to: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.LOGIN}`);
+    
     axios
-      .post("/api/user/login", userInfo)
+      .post(API_CONFIG.ENDPOINTS.USER.LOGIN, userInfo)
       .then((response) => {
         if (response.data) {
-          toast.success("Login successful");
+          toast.success("✅ Login successful");
         }
         localStorage.setItem("ChatApp", JSON.stringify(response.data));
         setAuthUser(response.data);
       })
       .catch((error) => {
+        console.error("❌ Login error:", error);
         if (error.response) {
           toast.error("Error: " + error.response.data.error);
+        } else if (error.request) {
+          toast.error("Network error: Unable to connect to server");
+        } else {
+          toast.error("Login failed: " + error.message);
         }
       });
   };
