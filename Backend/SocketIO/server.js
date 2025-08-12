@@ -9,16 +9,10 @@ const server = http.createServer(app);
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// Dynamic CORS configuration for Socket.IO
+// Dynamic CORS configuration for Socket.IO - Allow all origins
 function getCorsConfig() {
   return {
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:5174', 
-      'http://localhost:5175',
-      'http://localhost:3000',
-      FRONTEND_URL
-    ],
+    origin: true, // Allow all origins
     credentials: true,
     methods: ['GET', 'POST'],
   };
@@ -29,7 +23,7 @@ const io = new Server(server, {
 });
 
 console.log(`🔌 Socket.IO configured for ${NODE_ENV} environment`);
-console.log(`🌐 Allowed origins:`, getCorsConfig().origin);
+console.log(`🌐 CORS enabled for all origins:`, getCorsConfig().origin);
 
 // realtime message code goes here
 export const getReceiverSocketId = (receiverId) => {

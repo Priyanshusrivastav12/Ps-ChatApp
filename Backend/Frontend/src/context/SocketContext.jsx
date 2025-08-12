@@ -26,6 +26,11 @@ export const SocketProvider = ({ children }) => {
         transports: ['websocket', 'polling'], // Fallback to polling if websocket fails
         timeout: 20000,
         forceNew: true,
+        withCredentials: true, // Enable credentials for CORS
+        cors: {
+          origin: "*", // Allow all origins
+          methods: ["GET", "POST"]
+        }
       });
 
       // Connection event handlers

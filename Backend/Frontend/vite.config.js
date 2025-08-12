@@ -17,12 +17,18 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 5174,
       host: true, // Allow external connections
+      cors: true, // Enable CORS for all origins
       proxy: {
         "/api": {
           target: apiBaseUrl,
           changeOrigin: true,
           secure: mode === 'production', // Use secure in production
           ws: true, // Enable WebSocket proxying
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
+          },
           configure: (proxy, _options) => {
             proxy.on('error', (err, _req, _res) => {
               console.log('🚨 Proxy error', err);

@@ -16,12 +16,13 @@ const createTokenAndSaveCookie = (userId, res) => {
   res.cookie("jwt", token, {
     httpOnly: true, // XSS protection
     secure: isProduction, // Only use secure cookies in production (HTTPS)
-    sameSite: isProduction ? "none" : "lax", // Allow cross-site cookies in production
+    sameSite: isProduction ? "none" : "lax", // Allow cross-site cookies
     maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-    domain: isProduction ? undefined : undefined, // Let browser determine domain
+    domain: undefined, // Allow all domains
     path: "/", // Ensure cookie is available for all paths
   });
   
   console.log(`🍪 JWT Cookie set - Production: ${isProduction}, Secure: ${isProduction}, SameSite: ${isProduction ? "none" : "lax"}`);
 };
+
 export default createTokenAndSaveCookie;
