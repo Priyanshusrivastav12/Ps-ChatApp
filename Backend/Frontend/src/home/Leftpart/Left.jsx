@@ -13,9 +13,9 @@ function Left() {
   return (
     <div className="w-full h-full bg-black text-gray-300 flex flex-col">
       {/* Header with Profile */}
-      <div className="flex-shrink-0 p-4 border-b border-gray-700">
+      <div className="flex-shrink-0 p-4 border-b border-gray-700 lg:pt-4 pt-16">
         <div className="flex items-center justify-between">
-          {/* App title for mobile */}
+          {/* App title for mobile - adjusted positioning */}
           <h1 className="lg:hidden text-xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
             ChatApp
           </h1>

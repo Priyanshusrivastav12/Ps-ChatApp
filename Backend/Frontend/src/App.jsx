@@ -40,8 +40,8 @@ function App() {
                     className="drawer-overlay"
                   ></label>
                   <div className="min-h-full w-80 bg-black text-base-content relative">
-                    {/* Mobile close button */}
-                    <div className="lg:hidden absolute top-4 right-4 z-10">
+                    {/* Mobile close button - moved to top-left to avoid overlap with settings */}
+                    <div className="lg:hidden absolute top-4 left-4 z-20">
                       <label
                         htmlFor="my-drawer-2"
                         className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/10"

@@ -31,8 +31,8 @@ function Right() {
         <NoChatSelected />
       ) : (
         <>
-          {/* Chat Header with Search */}
-          <div className="relative">
+          {/* Chat Header with Search - Sticky/Fixed */}
+          <div className="relative sticky top-0 z-30 bg-slate-900/95 backdrop-blur-sm">
             <Chatuser />
             {selectedConversation && (
               <>
@@ -70,8 +70,10 @@ function Right() {
             <Messages ref={messagesRef} />
           </div>
           
-          {/* Message Input */}
-          <Typesend />
+          {/* Message Input - Sticky/Fixed at bottom */}
+          <div className="sticky bottom-0 z-30 bg-slate-900/95 backdrop-blur-sm">
+            <Typesend />
+          </div>
         </>
       )}
     </div>
@@ -89,8 +91,8 @@ const NoChatSelected = () => {
       <div className="absolute inset-0 animated-grid"></div>
       <div className="floating-particles absolute inset-0"></div>
       
-      {/* Mobile header with menu button */}
-      <div className="lg:hidden relative z-20 p-4 flex items-center">
+      {/* Mobile header with menu button - Sticky/Fixed */}
+      <div className="lg:hidden sticky top-0 z-30 bg-slate-900/95 backdrop-blur-sm relative p-4 flex items-center">
         <label
           htmlFor="my-drawer-2"
           className="btn btn-ghost drawer-button glass-effect"
