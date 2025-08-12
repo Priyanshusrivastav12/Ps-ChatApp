@@ -32,7 +32,7 @@ function Right() {
       ) : (
         <>
           {/* Chat Header with Search - Sticky/Fixed */}
-          <div className="relative sticky top-0 z-30 bg-slate-900/95 backdrop-blur-sm">
+          <div className="relative sticky top-0 z-30 bg-slate-900/95 backdrop-blur-sm border-b border-white/10">
             <Chatuser />
             {selectedConversation && (
               <>
@@ -65,13 +65,11 @@ function Right() {
             onClose={() => setShowSearch(false)}
           />
           
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto">
-            <Messages ref={messagesRef} />
-          </div>
+          {/* Messages Area - Scrollable between fixed header and input */}
+          <Messages ref={messagesRef} />
           
           {/* Message Input - Sticky/Fixed at bottom */}
-          <div className="sticky bottom-0 z-30 bg-slate-900/95 backdrop-blur-sm">
+          <div className="sticky bottom-0 z-30 bg-slate-900/95 backdrop-blur-sm border-t border-white/10">
             <Typesend />
           </div>
         </>

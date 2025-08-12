@@ -50,14 +50,17 @@ const Messages = forwardRef((props, ref) => {
   return (
     <div
       ref={messagesContainerRef}
-      className="flex-1 overflow-y-auto chat-messages-bg relative"
-      style={{ minHeight: "calc(92vh - 8vh)" }}
+      className="flex-1 overflow-y-auto chat-messages-bg relative px-2 py-4"
+      style={{ 
+        height: "calc(100vh - 16vh)", // Account for header (8vh) and input (8vh)
+        minHeight: "calc(100vh - 16vh)"
+      }}
     >
       {/* Floating particles overlay */}
       <div className="floating-particles absolute inset-0 pointer-events-none"></div>
       
       {/* Content container with higher z-index */}
-      <div className="relative z-10">
+      <div className="relative z-10 min-h-full">
         {loading ? (
           <div className="flex justify-center items-center h-full">
             <div className="glass-effect p-6 rounded-xl">

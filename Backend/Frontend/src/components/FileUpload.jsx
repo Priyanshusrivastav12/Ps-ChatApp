@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { IoAttach, IoImage, IoDocument, IoClose } from 'react-icons/io5';
 import { MdVideoFile, MdAudioFile } from 'react-icons/md';
 
@@ -8,7 +9,34 @@ function FileUpload({ onFileSelect, onCancel, maxFileSize = 10 * 1024 * 1024 }) 
   const [preview, setPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [modalRoot, setModalRoot] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Create modal root element
+  useEffect(() => {
+    let modalElement = document.getElementById('modal-root');
+    if (!modalElement) {
+      modalElement = document.createElement('div');
+      modalElement.id = 'modal-root';
+      modalElement.style.position = 'fixed';
+      modalElement.style.top = '0';
+      modalElement.style.left = '0';
+      modalElement.style.width = '100%';
+      modalElement.style.height = '100%';
+      modalElement.style.zIndex = '99999';
+      modalElement.style.pointerEvents = 'none';
+      document.body.appendChild(modalElement);
+    }
+    setModalRoot(modalElement);
+    
+    return () => {
+      // Clean up on unmount
+      const element = document.getElementById('modal-root');
+      if (element && element.children.length === 0) {
+        document.body.removeChild(element);
+      }
+    };
+  }, []);
 
   const allowedTypes = {
     image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
@@ -138,14 +166,35 @@ function FileUpload({ onFileSelect, onCancel, maxFileSize = 10 * 1024 * 1024 }) 
     onCancel();
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-6">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 99999,
+        pointerEvents: 'all'
+      }}
+      onClick={(e) => e.target === e.currentTarget && handleCancel()}
+    >
+      <div 
+        className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[80vh] overflow-y-auto animate-fadeInUp"
+        style={{
+          position: 'relative',
+          zIndex: 100000
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold text-white">Share File</h3>
           <button
             onClick={handleCancel}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-700"
           >
             <IoClose className="text-xl" />
           </button>
@@ -245,6 +294,9 @@ function FileUpload({ onFileSelect, onCancel, maxFileSize = 10 * 1024 * 1024 }) 
       </div>
     </div>
   );
+
+  // Use portal to render at document body level
+  return modalRoot ? createPortal(modalContent, modalRoot) : null;
 }
 
 export default FileUpload;

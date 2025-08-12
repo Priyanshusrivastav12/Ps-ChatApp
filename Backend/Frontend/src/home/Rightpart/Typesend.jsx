@@ -21,28 +21,19 @@ function Typesend() {
   const emojiPickerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Common emojis organized by categories
-  const emojiCategories = {
-    "Smileys & People": [
-      "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
-      "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
-      "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩"
-    ],
-    "Hearts & Love": [
-      "❤️", "�", "�", "�", "�", "�", "�", "�", "�", "�",
-      "❣️", "�", "�", "�", "�", "�", "�", "�", "�", "☮️"
-    ],
-    "Hands & Gestures": [
-      "👍", "👎", "👌", "🤞", "✌️", "🤟", "🤘", "🤙", "👈", "👉",
-      "👆", "👇", "☝️", "👋", "🤚", "🖐️", "✋", "🖖", "👏", "🙌"
-    ],
-    "Celebrations": [
-      "✨", "🎉", "🎊", "🎈", "🎁", "🏆", "🥇", "🌟", "⭐", "�",
-      "🎀", "🎗️", "🎟️", "🎫", "🎪", "🎭", "🎨", "🎬", "🎤", "🎧"
-    ]
-  };
-
-  const [selectedCategory, setSelectedCategory] = useState("Smileys & People");
+  // All emojis in one simple array
+  const allEmojis = [
+    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
+    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩",
+    "❤️", "💖", "💕", "💘", "💝", "💗", "💓", "💞", "💟", "💌",
+    "❣️", "💋", "💍", "💎", "🌹", "🌺", "🌻", "🌷", "🌸", "☮️",
+    "👍", "👎", "👌", "🤞", "✌️", "🤟", "🤘", "🤙", "👈", "👉",
+    "👆", "👇", "☝️", "👋", "🤚", "🖐️", "✋", "🖖", "👏", "🙌",
+    "✨", "🎉", "🎊", "🎈", "🎁", "🏆", "🥇", "🌟", "⭐", "💫",
+    "🎀", "🎗️", "🎟️", "🎫", "🎪", "🎭", "🎨", "🎬", "🎤", "🎧",
+    "🔥", "💯", "💪", "👑", "💰", "💸", "🎯", "🚀", "⚡", "💡"
+  ];
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -323,52 +314,35 @@ function Typesend() {
         </div>
       </form>
 
-      {/* Enhanced Emoji Picker with Categories - Mobile Responsive */}
+      {/* Simplified Emoji Picker - All emojis in one view */}
       {showEmojiPicker && (
         <div 
           ref={emojiPickerRef}
-          className="absolute bottom-full right-2 sm:right-4 mb-2 glass-effect border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl w-80 sm:w-96 z-50 animate-fadeInUp"
+          className="absolute bottom-full right-2 sm:right-4 mb-2 bg-gray-900 border border-gray-600 rounded-xl sm:rounded-2xl shadow-2xl w-80 sm:w-96 z-50 animate-fadeInUp max-h-[60vh] flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-white/10">
+          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-700 bg-gray-800 rounded-t-xl">
             <h3 className="text-white font-medium flex items-center text-sm sm:text-base">
               <span className="mr-2">😊</span>
-              Emoji Picker
+              Choose Emoji
             </h3>
             <button
               onClick={() => setShowEmojiPicker(false)}
-              className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
+              className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-700"
             >
               <MdClose className="text-lg" />
             </button>
           </div>
           
-          {/* Category Tabs */}
-          <div className="flex space-x-1 p-2 bg-black/20 border-b border-white/10 overflow-x-auto">
-            {Object.keys(emojiCategories).map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1 rounded-lg text-xs whitespace-nowrap transition-all ${
-                  selectedCategory === category
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-          
-          {/* Emoji Grid */}
-          <div className="p-3 max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar">
+          {/* All Emojis Grid - No categories */}
+          <div className="flex-1 p-3 overflow-y-auto custom-scrollbar bg-gray-900 min-h-0">
             <div className="grid grid-cols-8 sm:grid-cols-10 gap-1 sm:gap-2">
-              {emojiCategories[selectedCategory].map((emoji, index) => (
+              {allEmojis.map((emoji, index) => (
                 <button
                   key={index}
                   type="button"
                   onClick={() => handleEmojiClick(emoji)}
-                  className="text-lg sm:text-2xl hover:bg-white/10 rounded-lg p-1 sm:p-2 transition-all duration-200 focus:outline-none focus:bg-white/20 hover:scale-110 transform"
+                  className="text-lg sm:text-2xl hover:bg-gray-700 rounded-lg p-1 sm:p-2 transition-all duration-200 focus:outline-none focus:bg-gray-600 hover:scale-110 transform active:scale-95 focus:ring-2 focus:ring-blue-500/50"
                   title={emoji}
                 >
                   {emoji}
