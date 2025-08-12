@@ -127,32 +127,47 @@ function Typesend() {
 
   return (
     <div className="relative">
-      <form onSubmit={handleSubmit}>
-        <div className="flex space-x-1 h-[8vh] bg-gray-800">
-          {/* Input container with emoji picker */}
-          <div className="w-[70%] mx-4 relative">
-            <input
-              ref={inputRef}
-              id="message-input"
-              name="message"
-              type="text"
-              placeholder="Type here"
-              value={message}
-              onChange={handleChange}
-              className="border border-gray-700 rounded-xl outline-none mt-1 px-4 py-3 pr-12 w-full text-white bg-gray-700 focus:border-blue-500 transition-colors"
-            />
+      {/* Background with subtle animation */}
+      <div className="absolute inset-0 glass-effect border-t border-white/10"></div>
+      
+      <form onSubmit={handleSubmit} className="relative z-10">
+        <div className="flex space-x-3 h-[8vh] px-4 py-2">
+          {/* Input container with enhanced styling */}
+          <div className="flex-1 relative">
+            <div className="relative group">
+              <input
+                ref={inputRef}
+                id="message-input"
+                name="message"
+                type="text"
+                placeholder="Type your message..."
+                value={message}
+                onChange={handleChange}
+                className="w-full px-6 py-3 pr-16 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 rounded-2xl outline-none text-white placeholder-gray-400 transition-all duration-300 focus:border-blue-500/70 focus:shadow-lg focus:shadow-blue-500/25 group-hover:border-slate-500/70"
+              />
+              
+              {/* Input glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-green-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              
+              {/* Character count indicator */}
+              {message.length > 0 && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+                  {message.length}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Action buttons container */}
-          <div className="flex items-center space-x-2 mr-4">
+          <div className="flex items-center space-x-2">
             {/* Emoji button */}
             <button
               type="button"
               onClick={toggleEmojiPicker}
-              className="text-yellow-400 hover:text-yellow-300 transition-colors p-2 rounded-lg hover:bg-gray-700"
+              className="p-3 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 text-yellow-400 hover:text-yellow-300 hover:border-yellow-500/50 hover:shadow-lg hover:shadow-yellow-500/25 transition-all duration-300 group"
               title="Add emoji"
             >
-              <BsEmojiSmile className="text-2xl" />
+              <BsEmojiSmile className="text-xl group-hover:scale-110 transition-transform duration-300" />
             </button>
 
             {/* Undo button */}
@@ -160,14 +175,14 @@ function Typesend() {
               type="button"
               onClick={handleUndo}
               disabled={historyIndex === 0}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
                 historyIndex === 0 
-                  ? 'text-gray-500 cursor-not-allowed' 
-                  : 'text-blue-400 hover:text-blue-300 hover:bg-gray-700'
+                  ? 'bg-slate-800/50 border-slate-600/30 text-gray-500 cursor-not-allowed' 
+                  : 'bg-slate-800/80 border-slate-600/50 text-blue-400 hover:text-blue-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/25'
               }`}
               title="Undo"
             >
-              <MdUndo className="text-2xl" />
+              <MdUndo className="text-xl" />
             </button>
 
             {/* Clear button */}
@@ -175,55 +190,58 @@ function Typesend() {
               type="button"
               onClick={handleClear}
               disabled={!message.trim()}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
                 !message.trim() 
-                  ? 'text-gray-500 cursor-not-allowed' 
-                  : 'text-red-400 hover:text-red-300 hover:bg-gray-700'
+                  ? 'bg-slate-800/50 border-slate-600/30 text-gray-500 cursor-not-allowed' 
+                  : 'bg-slate-800/80 border-slate-600/50 text-red-400 hover:text-red-300 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/25'
               }`}
               title="Clear"
             >
-              <MdClear className="text-2xl" />
+              <MdClear className="text-xl" />
             </button>
 
             {/* Send button */}
             <button
               type="submit"
               disabled={!message.trim() || loading}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-3 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
                 !message.trim() || loading
-                  ? 'text-gray-500 cursor-not-allowed'
-                  : 'text-green-400 hover:text-green-300 hover:bg-gray-700'
+                  ? 'bg-slate-800/50 border-slate-600/30 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-600 to-green-500 border-green-500/50 text-white hover:from-green-500 hover:to-green-400 hover:shadow-lg hover:shadow-green-500/25 transform hover:scale-105'
               }`}
               title="Send message"
             >
-              <IoSend className="text-2xl" />
+              <IoSend className={`text-xl ${loading ? 'animate-pulse' : ''}`} />
             </button>
           </div>
         </div>
       </form>
 
-      {/* Emoji Picker */}
+      {/* Enhanced Emoji Picker */}
       {showEmojiPicker && (
         <div 
           ref={emojiPickerRef}
-          className="absolute bottom-full right-4 mb-2 bg-gray-800 border border-gray-600 rounded-lg shadow-lg p-4 max-w-md z-50"
+          className="absolute bottom-full right-4 mb-2 glass-effect border border-white/20 rounded-2xl shadow-2xl p-6 max-w-md z-50 animate-fadeInUp"
         >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-white font-medium">Emojis</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white font-medium flex items-center">
+              <span className="mr-2">😊</span>
+              Emojis
+            </h3>
             <button
               onClick={() => setShowEmojiPicker(false)}
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
             >
               ✕
             </button>
           </div>
-          <div className="grid grid-cols-10 gap-2 max-h-64 overflow-y-auto">
+          <div className="grid grid-cols-10 gap-2 max-h-64 overflow-y-auto custom-scrollbar">
             {emojis.map((emoji, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => handleEmojiClick(emoji)}
-                className="text-2xl hover:bg-gray-700 rounded p-1 transition-colors focus:outline-none focus:bg-gray-600"
+                className="text-2xl hover:bg-white/10 rounded-lg p-2 transition-all duration-200 focus:outline-none focus:bg-white/20 hover:scale-110 transform"
                 title={emoji}
               >
                 {emoji}
