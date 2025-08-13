@@ -16,18 +16,24 @@ export default defineConfig(({ command, mode }) => {
     plugins: [react()],
     server: {
       port: 5174,
-      host: true, // Allow external connections
-      cors: true, // Enable CORS for all origins
+      host: '0.0.0.0', // Allow external connections from any IP
+      cors: {
+        origin: true, // Allow all origins
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept', 'Origin']
+      },
       proxy: {
         "/api": {
           target: apiBaseUrl,
           changeOrigin: true,
-          secure: mode === 'production', // Use secure in production
+          secure: false, // Allow insecure connections for development
           ws: true, // Enable WebSocket proxying
           headers: {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
+            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS,PATCH,HEAD',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept, Origin, Cookie',
+            'Access-Control-Allow-Credentials': 'true',
           },
           configure: (proxy, _options) => {
             proxy.on('error', (err, _req, _res) => {
@@ -35,9 +41,15 @@ export default defineConfig(({ command, mode }) => {
             });
             proxy.on('proxyReq', (proxyReq, req, _res) => {
               console.log('📤 Sending Request to the Target:', req.method, req.url);
+              // Add CORS headers to proxy request
+              proxyReq.setHeader('Access-Control-Allow-Origin', '*');
+              proxyReq.setHeader('Access-Control-Allow-Credentials', 'true');
             });
             proxy.on('proxyRes', (proxyRes, req, _res) => {
               console.log('📥 Received Response from the Target:', proxyRes.statusCode, req.url);
+              // Add CORS headers to proxy response
+              proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+              proxyRes.headers['Access-Control-Allow-Credentials'] = 'true';
             });
           },
         },

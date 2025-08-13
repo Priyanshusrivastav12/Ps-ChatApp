@@ -9,17 +9,36 @@ const server = http.createServer(app);
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// Dynamic CORS configuration for Socket.IO - Allow all origins
+// Dynamic CORS configuration for Socket.IO - Allow all origins everywhere
 function getCorsConfig() {
   return {
-    origin: true, // Allow all origins
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      callback(null, true);
+    },
     credentials: true,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: [
+      'Content-Type', 
+      'Authorization', 
+      'Cookie', 
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers'
+    ],
+    transports: ['websocket', 'polling'],
+    allowEIO3: true
   };
 }
 
 const io = new Server(server, {
-  cors: getCorsConfig()
+  cors: getCorsConfig(),
+  allowEIO3: true,
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 console.log(`🔌 Socket.IO configured for ${NODE_ENV} environment`);
