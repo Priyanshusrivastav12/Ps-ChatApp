@@ -65,8 +65,10 @@ function Right() {
             onClose={() => setShowSearch(false)}
           />
           
-          {/* Messages Area - Scrollable between fixed header and input */}
-          <Messages ref={messagesRef} />
+          {/* Messages Area - Flex-1 to take remaining space */}
+          <div className="flex-1 min-h-0 overflow-hidden messages-container">
+            <Messages ref={messagesRef} />
+          </div>
           
           {/* Message Input - Sticky/Fixed at bottom */}
           <div className="sticky bottom-0 z-30 bg-slate-900/95 backdrop-blur-sm border-t border-white/10">
