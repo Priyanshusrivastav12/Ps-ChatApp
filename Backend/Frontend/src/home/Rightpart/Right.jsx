@@ -5,6 +5,7 @@ import Typesend from "./Typesend";
 import MessageSearch from "../../components/MessageSearch";
 import useConversation from "../../zustand/useConversation.js";
 import { useAuth } from "../../context/AuthProvider.jsx";
+import { useTheme } from "../../context/ThemeProvider.jsx";
 import { CiMenuFries } from "react-icons/ci";
 import { IoSearch } from "react-icons/io5";
 
@@ -12,6 +13,7 @@ function Right() {
   const { selectedConversation, setSelectedConversation, messages } = useConversation();
   const [showSearch, setShowSearch] = useState(false);
   const messagesRef = useRef(null);
+  const { isDark } = useTheme();
   
   useEffect(() => {
     return setSelectedConversation(null);
@@ -26,20 +28,30 @@ function Right() {
   };
 
   return (
-    <div className="w-full h-screen bg-slate-900 text-gray-300 relative overflow-hidden flex flex-col">
+    <div className={`w-full h-screen text-gray-300 relative overflow-hidden flex flex-col transition-colors duration-200 ${
+      isDark ? 'bg-slate-900' : 'bg-gray-100'
+    }`}>
       {!selectedConversation ? (
         <NoChatSelected />
       ) : (
         <>
           {/* Chat Header with Search - Sticky/Fixed */}
-          <div className="relative sticky top-0 z-30 bg-slate-900/95 backdrop-blur-sm border-b border-white/10">
+          <div className={`relative sticky top-0 z-30 backdrop-blur-sm border-b transition-colors duration-200 ${
+            isDark 
+              ? 'bg-slate-900/95 border-white/10' 
+              : 'bg-white/95 border-gray-200'
+          }`}>
             <Chatuser />
             {selectedConversation && (
               <>
                 {/* Desktop search button */}
                 <button
                   onClick={() => setShowSearch(true)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors hidden lg:block z-20"
+                  className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors hidden lg:block z-20 ${
+                    isDark 
+                      ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                  }`}
                   title="Search messages"
                 >
                   <IoSearch className="text-lg" />
@@ -48,7 +60,11 @@ function Right() {
                 {/* Mobile search button - positioned to avoid overlap */}
                 <button
                   onClick={() => setShowSearch(true)}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors lg:hidden z-20 w-10 h-10 flex items-center justify-center"
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors lg:hidden z-20 w-10 h-10 flex items-center justify-center ${
+                    isDark 
+                      ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                  }`}
                   title="Search messages"
                 >
                   <IoSearch className="text-base" />
@@ -71,7 +87,11 @@ function Right() {
           </div>
           
           {/* Message Input - Sticky/Fixed at bottom */}
-          <div className="sticky bottom-0 z-30 bg-slate-900/95 backdrop-blur-sm border-t border-white/10">
+          <div className={`sticky bottom-0 z-30 backdrop-blur-sm border-t transition-colors duration-200 ${
+            isDark 
+              ? 'bg-slate-900/95 border-white/10' 
+              : 'bg-white/95 border-gray-200'
+          }`}>
             <Typesend />
           </div>
         </>
@@ -84,6 +104,7 @@ export default Right;
 
 const NoChatSelected = () => {
   const [authUser] = useAuth();
+  const { isDark } = useTheme();
   console.log(authUser);
   return (
     <div className="relative h-full overflow-hidden flex flex-col">
@@ -92,15 +113,19 @@ const NoChatSelected = () => {
       <div className="floating-particles absolute inset-0"></div>
       
       {/* Mobile header with menu button - Sticky/Fixed */}
-      <div className="lg:hidden sticky top-0 z-30 bg-slate-900/95 backdrop-blur-sm relative p-4 flex items-center">
+      <div className={`lg:hidden sticky top-0 z-30 backdrop-blur-sm relative p-4 flex items-center transition-colors duration-200 ${
+        isDark ? 'bg-slate-900/95' : 'bg-white/95'
+      }`}>
         <label
           htmlFor="my-drawer-2"
-          className="btn btn-ghost drawer-button glass-effect"
+          className={`btn btn-ghost drawer-button glass-effect ${isDark ? 'text-white' : 'text-gray-900'}`}
         >
-          <CiMenuFries className="text-white text-xl" />
+          <CiMenuFries className="text-xl" />
         </label>
         <div className="ml-4">
-          <h1 className="text-lg font-semibold text-white">ChatApp</h1>
+          <h1 className={`text-lg font-semibold transition-colors duration-200 ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}>ChatApp</h1>
         </div>
       </div>
       
@@ -112,7 +137,9 @@ const NoChatSelected = () => {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-green-400 bg-clip-text text-transparent animate-pulse">
               Welcome
             </h1>
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white mt-2">
+            <h2 className={`text-lg sm:text-xl lg:text-2xl font-semibold mt-2 transition-colors duration-200 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
               {authUser.user.fullname}
             </h2>
           </div>
@@ -126,17 +153,27 @@ const NoChatSelected = () => {
           
           {/* Main message */}
           <div className="space-y-3 sm:space-y-4">
-            <p className="text-sm sm:text-base lg:text-lg text-gray-300 leading-relaxed">
+            <p className={`text-sm sm:text-base lg:text-lg leading-relaxed transition-colors duration-200 ${
+              isDark ? 'text-gray-300' : 'text-gray-700'
+            }`}>
               No chat selected, please start conversation by selecting anyone from your contacts
             </p>
-            <p className="text-xs sm:text-sm text-gray-400">
+            <p className={`text-xs sm:text-sm transition-colors duration-200 ${
+              isDark ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               Experience beautiful animations and enhanced UI while chatting
             </p>
           </div>
           
           {/* Mobile instruction */}
-          <div className="lg:hidden mt-6 p-3 bg-blue-500/20 rounded-lg border border-blue-500/30">
-            <p className="text-sm text-blue-300">
+          <div className={`lg:hidden mt-6 p-3 rounded-lg border transition-colors duration-200 ${
+            isDark 
+              ? 'bg-blue-500/20 border-blue-500/30' 
+              : 'bg-blue-50 border-blue-200'
+          }`}>
+            <p className={`text-sm transition-colors duration-200 ${
+              isDark ? 'text-blue-300' : 'text-blue-700'
+            }`}>
               📱 Tap the menu button above to view your contacts
             </p>
           </div>
@@ -145,15 +182,21 @@ const NoChatSelected = () => {
           <div className="mt-6 sm:mt-8 grid grid-cols-3 gap-2 sm:gap-4 text-xs">
             <div className="glass-effect p-2 sm:p-3 rounded-lg">
               <div className="text-blue-400 mb-1">✨</div>
-              <div className="text-xs">Animated Backgrounds</div>
+              <div className={`text-xs transition-colors duration-200 ${
+                isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}>Animated Backgrounds</div>
             </div>
             <div className="glass-effect p-2 sm:p-3 rounded-lg">
               <div className="text-purple-400 mb-1">💬</div>
-              <div className="text-xs">Real-time Chat</div>
+              <div className={`text-xs transition-colors duration-200 ${
+                isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}>Real-time Chat</div>
             </div>
             <div className="glass-effect p-2 sm:p-3 rounded-lg">
               <div className="text-green-400 mb-1">🎨</div>
-              <div className="text-xs">Beautiful UI</div>
+              <div className={`text-xs transition-colors duration-200 ${
+                isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}>Beautiful UI</div>
             </div>
           </div>
         </div>

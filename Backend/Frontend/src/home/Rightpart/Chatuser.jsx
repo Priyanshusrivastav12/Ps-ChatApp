@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import useConversation from "../../zustand/useConversation.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
+import { useTheme } from "../../context/ThemeProvider.jsx";
 import { CiMenuFries } from "react-icons/ci";
+import { IoMoon, IoSunny } from "react-icons/io5";
 import profile from "../../assets/user.jpg";
 
 function Chatuser() {
   const { selectedConversation } = useConversation();
   const { onlineUsers, socket } = useSocketContext();
+  const { isDark, toggleTheme } = useTheme();
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
@@ -38,18 +41,26 @@ function Chatuser() {
   const isOnline = onlineUsers.includes(selectedConversation._id);
 
   return (
-    <div className="relative glass-effect border-b border-white/10 shadow-lg">
+    <div className={`relative glass-effect border-b shadow-lg transition-colors duration-200 ${
+      isDark ? 'border-white/10' : 'border-gray-200'
+    }`}>
       {/* Mobile menu button - positioned to avoid overlap */}
       <label
         htmlFor="my-drawer-2"
-        className="btn btn-ghost drawer-button lg:hidden absolute left-2 top-1/2 transform -translate-y-1/2 z-30 glass-effect w-10 h-10 min-h-10 p-2"
+        className={`btn btn-ghost drawer-button lg:hidden absolute left-2 top-1/2 transform -translate-y-1/2 z-30 glass-effect w-10 h-10 min-h-10 p-2 ${
+          isDark ? 'text-white' : 'text-gray-900'
+        }`}
       >
-        <CiMenuFries className="text-white text-lg" />
+        <CiMenuFries className="text-lg" />
       </label>
       
       <div className="flex items-center justify-center h-[8vh] px-4 sm:px-6 relative overflow-hidden">
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50"></div>
+        <div className={`absolute inset-0 transition-colors duration-200 ${
+          isDark 
+            ? 'bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50' 
+            : 'bg-gradient-to-r from-gray-100/50 via-gray-50/50 to-gray-100/50'
+        }`}></div>
         
         {/* Animated accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60"></div>
@@ -83,7 +94,11 @@ function Chatuser() {
           
           {/* User info - responsive text sizing */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text truncate">
+            <h1 className={`text-base sm:text-lg lg:text-xl font-semibold truncate transition-colors duration-200 ${
+              isDark 
+                ? 'text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text' 
+                : 'text-gray-900 bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text'
+            }`}>
               {selectedConversation.fullname}
             </h1>
             <div className="flex items-center space-x-2">
@@ -97,19 +112,34 @@ function Chatuser() {
                   ? "text-blue-400 animate-pulse" 
                   : isOnline 
                     ? "text-green-400" 
-                    : "text-gray-400"
+                    : isDark ? "text-gray-400" : "text-gray-600"
               }`}>
                 {getOnlineUsersStatus(selectedConversation._id)}
               </span>
             </div>
           </div>
           
+          {/* Quick theme toggle button */}
+          <button
+            onClick={toggleTheme}
+            className={`hidden sm:flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110 ${
+              isDark 
+                ? 'text-yellow-400 hover:bg-yellow-400/20' 
+                : 'text-blue-600 hover:bg-blue-600/20'
+            }`}
+            title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          >
+            {isDark ? <IoSunny className="text-lg" /> : <IoMoon className="text-lg" />}
+          </button>
+          
           {/* Activity indicator - hidden on small screens to save space */}
-          <div className="hidden sm:flex flex-col items-center space-y-1 flex-shrink-0">
+          <div className="hidden md:flex flex-col items-center space-y-1 flex-shrink-0">
             <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
               isOnline ? "bg-green-400 animate-pulse" : "bg-gray-500"
             }`}></div>
-            <div className="text-xs text-gray-400">
+            <div className={`text-xs transition-colors duration-200 ${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               {isOnline ? "●" : "○"}
             </div>
           </div>

@@ -33,7 +33,7 @@ export const getReceiverSocketId = (receiverId) => {
 
 const users = {};
 
-// used to listen events on server side.
+//ueg used to listen events on server side.
 io.on("connection", (socket) => {
   console.log("🔗 User connected:", socket.id);
   const userId = socket.handshake.query.userId;
