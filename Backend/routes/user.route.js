@@ -10,15 +10,10 @@ import secureRoute from "../middleware/secureRoute.js";
 
 const router = express.Router();
 
-// Enable CORS for all user routes
+// Simple CORS for all user routes
 const corsOptions = {
-  origin: function (origin, callback) {
-    callback(null, origin || true);
-  },
-  credentials: function(req, callback) {
-    // Only enable credentials if there's an origin header
-    callback(null, !!req.headers.origin);
-  },
+  origin: true,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept', 'Origin'],
   optionsSuccessStatus: 200

@@ -3,25 +3,6 @@ import User from "../models/user.model.js";
 
 const secureRoute = async (req, res, next) => {
   try {
-    const origin = req.headers.origin;
-    
-    // Add CORS headers - never use * with credentials
-    if (origin) {
-      res.header('Access-Control-Allow-Origin', origin);
-      res.header('Access-Control-Allow-Credentials', 'true');
-    } else {
-      res.header('Access-Control-Allow-Origin', '*');
-      // Don't set credentials to true when using *
-    }
-    
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin');
-    
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-    
     const token = req.cookies.jwt;
     if (!token) {
       return res.status(401).json({ error: "No token, authorization denied" });

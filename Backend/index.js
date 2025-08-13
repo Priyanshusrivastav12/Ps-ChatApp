@@ -47,72 +47,19 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 
-// Dynamic CORS configuration - Allow all origins everywhere
+// Simple CORS configuration - Allow all origins
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Always allow the origin, whether it exists or not
-    callback(null, origin || true);
-  },
-  credentials: function(req, callback) {
-    // Only enable credentials if there's an origin header
-    callback(null, !!req.headers.origin);
-  },
+  origin: true,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'Cookie', 
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-    'Access-Control-Request-Method',
-    'Access-Control-Request-Headers',
-    'Cache-Control',
-    'Pragma',
-    'User-Agent',
-    'Referer'
-  ],
-  exposedHeaders: ['Set-Cookie', 'Authorization'],
-  preflightContinue: false,
-  optionsSuccessStatus: 200,
-  maxAge: 86400 // 24 hours
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
 
 // Handle preflight requests for all routes
 app.options('*', cors(corsOptions));
-
-// Additional CORS headers middleware for maximum compatibility
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  
-  // Always allow the requesting origin (never use * with credentials)
-  if (origin) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else {
-    // For requests without origin (like Postman), we can't use credentials anyway
-    res.header('Access-Control-Allow-Origin', '*');
-  }
-  
-  // Only set credentials to true if we have a specific origin
-  if (origin) {
-    res.header('Access-Control-Allow-Credentials', 'true');
-  }
-  
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Cache-Control, Pragma, User-Agent, Referer');
-  res.header('Access-Control-Expose-Headers', 'Set-Cookie, Authorization');
-  res.header('Access-Control-Max-Age', '86400');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  
-  next();
-});
 
 // Environment-specific CSP headers
 if (NODE_ENV !== "production") {
