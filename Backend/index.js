@@ -51,6 +51,7 @@ app.use(cookieParser());
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
+    // Also allow all origins in production
     callback(null, true);
   },
   credentials: true,
@@ -65,11 +66,14 @@ const corsOptions = {
     'Access-Control-Request-Method',
     'Access-Control-Request-Headers',
     'Cache-Control',
-    'Pragma'
+    'Pragma',
+    'User-Agent',
+    'Referer'
   ],
-  exposedHeaders: ['Set-Cookie'],
+  exposedHeaders: ['Set-Cookie', 'Authorization'],
   preflightContinue: false,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  maxAge: 86400 // 24 hours
 };
 
 app.use(cors(corsOptions));
@@ -79,11 +83,27 @@ app.options('*', cors(corsOptions));
 
 // Additional CORS headers middleware for maximum compatibility
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  
+  // Always allow the requesting origin
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+  
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Cache-Control, Pragma');
-  res.header('Access-Control-Expose-Headers', 'Set-Cookie');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Cache-Control, Pragma, User-Agent, Referer');
+  res.header('Access-Control-Expose-Headers', 'Set-Cookie, Authorization');
+  res.header('Access-Control-Max-Age', '86400');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
   next();
 });
 
@@ -103,16 +123,19 @@ if (NODE_ENV !== "production") {
     next();
   });
 } else {
-  // Production CSP headers
+  // Production CSP headers - Allow all origins for maximum compatibility
   app.use((req, res, next) => {
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self' 'unsafe-inline' https://ps-chatapp.onrender.com; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ps-chatapp.onrender.com; " +
-      "style-src 'self' 'unsafe-inline' https://ps-chatapp.onrender.com; " +
-      "img-src 'self' https://ps-chatapp.onrender.com data: blob:; " +
-      "connect-src 'self' https://ps-chatapp.onrender.com wss://ps-chatapp.onrender.com; " +
-      "font-src 'self' https://ps-chatapp.onrender.com data:;"
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' * data: blob:; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' * data:; " +
+      "style-src 'self' 'unsafe-inline' * data:; " +
+      "img-src 'self' * data: blob:; " +
+      "connect-src 'self' * wss: ws: http: https:; " +
+      "font-src 'self' * data:; " +
+      "media-src 'self' * data:; " +
+      "frame-src 'self' *; " +
+      "worker-src 'self' * blob:"
     );
     next();
   });
@@ -169,6 +192,22 @@ app.get("/api", (req, res) => {
       messages: "/api/message/send/:id, /api/message/get/:id"
     }
   });
+});
+
+// CORS test endpoint
+app.get("/api/cors-test", (req, res) => {
+  res.json({
+    message: "CORS is working!",
+    origin: req.headers.origin || "No origin header",
+    timestamp: new Date().toISOString(),
+    environment: NODE_ENV,
+    headers: req.headers
+  });
+});
+
+// Handle all OPTIONS requests
+app.options("/api/*", (req, res) => {
+  res.status(200).end();
 });
 
 server.listen(PORT, () => {
