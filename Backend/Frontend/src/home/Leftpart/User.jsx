@@ -1,12 +1,14 @@
 import React from "react";
 import useConversation from "../../zustand/useConversation.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
+import { useTheme } from "../../context/ThemeProvider.jsx";
 import profile from "../../assets/user.jpg";
 
 function User({ user }) {
   const { selectedConversation, setSelectedConversation } = useConversation();
   const isSelected = selectedConversation?._id === user._id;
   const { socket, onlineUsers } = useSocketContext();
+  const { isDark } = useTheme();
   const isOnline = onlineUsers.includes(user._id);
   
   const handleUserSelect = () => {
@@ -22,25 +24,15 @@ function User({ user }) {
     <div
       className={`relative transition-all duration-300 mx-2 mb-2 rounded-xl overflow-hidden group cursor-pointer ${
         isSelected 
-          ? "glass-effect border-blue-500/50 shadow-lg shadow-blue-500/25 transform scale-105" 
-          : "hover:glass-effect hover:border-white/20 hover:transform hover:scale-102"
+          ? isDark
+            ? "bg-slate-700/50 border border-blue-500/50 shadow-lg shadow-blue-500/25" 
+            : "bg-blue-50 border border-blue-200 shadow-md"
+          : isDark
+            ? "hover:bg-slate-700/30 hover:border-slate-600/50 border border-transparent"
+            : "hover:bg-gray-100 hover:border-gray-200 border border-transparent"
       }`}
       onClick={handleUserSelect}
     >
-      {/* Background gradient overlay */}
-      <div className={`absolute inset-0 bg-gradient-to-r transition-opacity duration-300 ${
-        isSelected 
-          ? "from-blue-600/20 to-purple-600/20 opacity-100" 
-          : "from-slate-600/10 to-slate-700/10 opacity-0 group-hover:opacity-100"
-      }`}></div>
-      
-      {/* Animated border on hover */}
-      {!isSelected && (
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-        </div>
-      )}
-      
       <div className="flex space-x-3 sm:space-x-4 px-4 sm:px-6 py-3 sm:py-4 relative z-10">
         <div className={`avatar ${isOnline ? "online" : ""} relative flex-shrink-0`}>
           <div className="w-10 sm:w-12 rounded-full ring-2 ring-offset-2 ring-offset-transparent transition-all duration-300 group-hover:ring-blue-400/50">
@@ -53,10 +45,22 @@ function User({ user }) {
         </div>
         
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-white truncate group-hover:text-blue-300 transition-colors duration-300 text-sm sm:text-base">
+          <h1 className={`font-bold truncate transition-colors duration-300 text-sm sm:text-base ${
+            isDark 
+              ? isSelected 
+                ? "text-white" 
+                : "text-gray-300 group-hover:text-white"
+              : isSelected
+                ? "text-gray-900"
+                : "text-gray-700 group-hover:text-gray-900"
+          }`}>
             {user.fullname}
           </h1>
-          <span className="text-xs sm:text-sm text-gray-400 truncate block group-hover:text-gray-300 transition-colors duration-300">
+          <span className={`text-xs sm:text-sm truncate block transition-colors duration-300 ${
+            isDark 
+              ? "text-gray-400 group-hover:text-gray-300"
+              : "text-gray-600 group-hover:text-gray-700"
+          }`}>
             {user.email}
           </span>
           
@@ -67,7 +71,9 @@ function User({ user }) {
                 ? "bg-green-400 shadow-lg shadow-green-400/50 animate-pulse" 
                 : "bg-gray-500"
             }`}></div>
-            <span className="text-xs text-gray-500">
+            <span className={`text-xs transition-colors duration-300 ${
+              isDark ? "text-gray-500" : "text-gray-600"
+            }`}>
               {isOnline ? "Online" : "Offline"}
             </span>
           </div>

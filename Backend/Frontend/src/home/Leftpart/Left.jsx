@@ -16,16 +16,16 @@ function Left() {
 
   return (
     <div className={`w-full h-full flex flex-col transition-colors duration-200 ${
-      isDark ? 'bg-black text-gray-300' : 'bg-white text-gray-700'
+      isDark ? 'bg-slate-900 text-gray-300' : 'bg-white text-gray-700'
     }`}>
       {/* Header with Profile */}
       <div className={`flex-shrink-0 p-4 border-b lg:pt-4 pt-16 transition-colors duration-200 ${
-        isDark ? 'border-gray-700' : 'border-gray-200'
+        isDark ? 'border-slate-700' : 'border-gray-200'
       }`}>
         <div className="flex items-center justify-between">
           {/* App title for mobile - adjusted positioning */}
-          <h1 className={`lg:hidden text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
-            isDark ? 'from-blue-400 to-green-400' : 'from-blue-600 to-green-600'
+          <h1 className={`lg:hidden text-xl font-bold transition-colors duration-200 ${
+            isDark ? 'text-white' : 'text-gray-900'
           }`}>
             ChatApp
           </h1>
@@ -35,7 +35,7 @@ function Left() {
             <div 
               className={`w-10 h-10 rounded-full overflow-hidden cursor-pointer transition-all duration-200 ${
                 isDark 
-                  ? 'bg-gray-700 hover:ring-2 hover:ring-blue-400/50' 
+                  ? 'bg-slate-700 hover:ring-2 hover:ring-blue-400/50' 
                   : 'bg-gray-200 hover:ring-2 hover:ring-blue-500/50'
               }`}
               onClick={() => setShowProfile(true)}
@@ -73,7 +73,7 @@ function Left() {
               onClick={() => setShowSettings(true)}
               className={`p-2 rounded-lg transition-all duration-200 ${
                 isDark 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' 
+                  ? 'text-gray-400 hover:text-white hover:bg-slate-700/50' 
                   : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }`}
               title="Appearance Settings"
@@ -86,7 +86,7 @@ function Left() {
               onClick={() => setShowProfile(true)}
               className={`p-2 rounded-lg transition-all duration-200 ${
                 isDark 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' 
+                  ? 'text-gray-400 hover:text-white hover:bg-slate-700/50' 
                   : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }`}
               title="Profile Settings"

@@ -12,7 +12,6 @@ import {
   FaSpinner, 
   FaGoogle, 
   FaGithub, 
-  FaShieldAlt,
   FaUserLock 
 } from 'react-icons/fa';
 
@@ -211,7 +210,7 @@ function Login() {
   return (
     <>
       <div className={`min-h-screen flex items-center justify-center p-4 relative transition-colors duration-200 ${
-        isDark ? 'bg-gray-900' : 'bg-gray-50'
+        isDark ? 'bg-slate-900' : 'bg-gray-50'
       }`}>
         {/* Subtle background pattern */}
         <div className="absolute inset-0 bg-pattern opacity-5"></div>
@@ -233,32 +232,40 @@ function Login() {
 
           <div className={`rounded-2xl shadow-xl border overflow-hidden transition-colors duration-200 ${
             isDark 
-              ? 'bg-gray-800 border-gray-700' 
+              ? 'bg-slate-800 border-slate-700' 
               : 'bg-white border-gray-100'
           }`}>
             {/* Header Section */}
             <div className={`px-8 py-12 text-center ${
               isDark 
-                ? 'bg-gradient-to-r from-blue-700 to-blue-800' 
+                ? 'bg-slate-800 border-b border-slate-700' 
                 : 'bg-gradient-to-r from-blue-600 to-blue-700'
             }`}>
               <div className="flex items-center justify-center mb-4">
-                <div className="bg-white rounded-full p-3 shadow-lg">
-                  <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`rounded-full p-3 shadow-lg ${
+                  isDark ? 'bg-slate-700' : 'bg-white'
+                }`}>
+                  <svg className={`w-8 h-8 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
                   </svg>
                 </div>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className={`text-3xl font-bold mb-2 ${
+                isDark ? 'text-white' : 'text-white'
+              }`}>
                 ChatApp
               </h1>
-              <p className="text-blue-100 text-sm">Connect with friends and family</p>
+              <p className={`text-sm ${
+                isDark ? 'text-gray-400' : 'text-blue-100'
+              }`}>Connect with friends and family</p>
             </div>
 
             {/* Form Section */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="px-8 py-8 space-y-6"
+              className={`px-8 py-8 space-y-6 ${
+                isDark ? 'bg-slate-800' : 'bg-white'
+              }`}
               noValidate
             >
               <div className="text-center mb-6">
@@ -291,7 +298,7 @@ function Login() {
                         : emailValue && !errors.email 
                           ? 'border-green-300 focus:border-green-500'
                           : isDark
-                            ? 'border-gray-600 focus:border-blue-500 bg-gray-700 text-white'
+                            ? 'border-slate-600 focus:border-blue-500 bg-slate-700 text-white placeholder-gray-400'
                             : 'border-gray-200 focus:border-blue-500 bg-gray-50 focus:bg-white text-gray-900'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                     placeholder="Enter your email"
@@ -321,7 +328,7 @@ function Login() {
 
               {/* Password */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                   Password
                 </label>
                 <div className="relative">
@@ -331,12 +338,14 @@ function Login() {
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     disabled={isLocked || isLoading}
-                    className={`w-full px-4 py-3 pr-12 border-2 rounded-lg bg-gray-50 focus:bg-white focus:outline-none transition-all duration-200 ${
+                    className={`w-full px-4 py-3 pr-12 border-2 rounded-lg focus:outline-none transition-all duration-200 ${
                       errors.password 
                         ? 'border-red-300 focus:border-red-500' 
                         : passwordValue && !errors.password 
                           ? 'border-green-300 focus:border-green-500'
-                          : 'border-gray-200 focus:border-blue-500'
+                          : isDark
+                            ? 'border-slate-600 focus:border-blue-500 bg-slate-700 text-white placeholder-gray-400'
+                            : 'border-gray-200 focus:border-blue-500 bg-gray-50 focus:bg-white text-gray-900'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                     placeholder="Enter your password"
                     {...register("password", { 
@@ -348,7 +357,9 @@ function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className={`absolute inset-y-0 right-0 pr-3 flex items-center transition-colors ${
+                      isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                    }`}
                     disabled={isLocked || isLoading}
                   >
                     {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
@@ -371,15 +382,19 @@ function Login() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className={`w-4 h-4 text-blue-600 rounded focus:ring-blue-500 ${
+                      isDark ? 'border-slate-600 bg-slate-700' : 'border-gray-300'
+                    }`}
                     disabled={isLocked || isLoading}
                   />
-                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                  <span className={`ml-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Remember me</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => handleForgotPassword(emailValue)}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className={`text-sm font-medium ${
+                    isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                  }`}
                   disabled={isLocked || isLoading}
                 >
                   Forgot password?
@@ -390,7 +405,11 @@ function Login() {
               <button
                 type="submit"
                 disabled={isLocked || isLoading || isSubmitting}
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                className={`w-full py-3 px-4 font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl ${
+                  isDark 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
               >
                 {isLoading ? (
                   <>
@@ -404,8 +423,12 @@ function Login() {
 
               {/* Login attempts indicator */}
               {loginAttempts > 0 && !isLocked && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-                  <p className="text-amber-800 text-sm">
+                <div className={`rounded-lg p-3 text-center border ${
+                  isDark 
+                    ? 'bg-amber-900/20 border-amber-700' 
+                    : 'bg-amber-50 border-amber-200'
+                }`}>
+                  <p className={`text-sm ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>
                     ⚠️ {loginAttempts}/5 login attempts used
                   </p>
                 </div>
@@ -414,10 +437,14 @@ function Login() {
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
+                  <div className={`w-full border-t ${isDark ? 'border-slate-600' : 'border-gray-300'}`}></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">or</span>
+                  <span className={`px-2 ${
+                    isDark 
+                      ? 'bg-slate-900 text-gray-400' 
+                      : 'bg-white text-gray-500'
+                  }`}>or</span>
                 </div>
               </div>
 
@@ -425,7 +452,11 @@ function Login() {
               <div className="space-y-3">
                 <button
                   type="button"
-                  className="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2 shadow-sm"
+                  className={`w-full py-3 px-4 border rounded-lg transition-colors flex items-center justify-center space-x-2 shadow-sm ${
+                    isDark 
+                      ? 'border-slate-600 text-gray-300 bg-slate-700 hover:bg-slate-600' 
+                      : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                  }`}
                   disabled={isLocked || isLoading}
                   onClick={() => toast.info("Google login coming soon!")}
                 >
@@ -434,11 +465,15 @@ function Login() {
                 </button>
                 <button
                   type="button"
-                  className="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2 shadow-sm"
+                  className={`w-full py-3 px-4 border rounded-lg transition-colors flex items-center justify-center space-x-2 shadow-sm ${
+                    isDark 
+                      ? 'border-slate-600 text-gray-300 bg-slate-700 hover:bg-slate-600' 
+                      : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                  }`}
                   disabled={isLocked || isLoading}
                   onClick={() => toast.info("GitHub login coming soon!")}
                 >
-                  <FaGithub className="text-gray-800" />
+                  <FaGithub className={isDark ? 'text-gray-300' : 'text-gray-800'} />
                   <span>Continue with GitHub</span>
                 </button>
               </div>

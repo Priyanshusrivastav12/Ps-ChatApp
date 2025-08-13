@@ -46,7 +46,7 @@ function App() {
                     className="drawer-overlay"
                   ></label>
                   <div className={`min-h-full w-80 text-base-content relative transition-colors duration-200 ${
-                    isDark ? 'bg-black' : 'bg-white'
+                    isDark ? 'bg-slate-900' : 'bg-white'
                   }`}>
                     {/* Mobile close button - moved to top-left to avoid overlap with settings */}
                     <div className="lg:hidden absolute top-4 left-4 z-20">

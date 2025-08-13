@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { FaSearch } from "react-icons/fa";
 import { BiLogOutCircle } from "react-icons/bi";
 import axios from "axios";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+import { useTheme } from "../../context/ThemeProvider";
 import { API_CONFIG } from "../../config/api.js";
 
 // Configure axios defaults
@@ -13,6 +13,7 @@ axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
 
 function Logout() {
   const [loading, setLoading] = useState(false);
+  const { isDark } = useTheme();
   
   const handleLogout = async () => {
     setLoading(true);
@@ -37,18 +38,29 @@ function Logout() {
       }
     }
   };
+  
   return (
-    <>
-      <hr />
-      <div className=" h-[10vh] bg-transparent">
-        <div>
-          <BiLogOutCircle
-            className="text-5xl text-white hover:bg-slate-700 duration-300 cursor-pointer rounded-full p-2 ml-2 mt-1"
-            onClick={handleLogout}
-          />
-        </div>
-      </div>
-    </>
+    <div className={`p-4 border-t transition-colors duration-200 ${
+      isDark ? 'border-slate-700' : 'border-gray-200'
+    }`}>
+      <button
+        onClick={handleLogout}
+        disabled={loading}
+        className={`w-full flex items-center justify-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
+          isDark 
+            ? 'text-gray-300 hover:text-white hover:bg-slate-700/50' 
+            : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
+        title="Logout"
+      >
+        <BiLogOutCircle className={`text-xl transition-transform duration-200 ${
+          loading ? 'animate-spin' : 'group-hover:scale-110'
+        }`} />
+        <span className="font-medium text-sm">
+          {loading ? 'Logging out...' : 'Logout'}
+        </span>
+      </button>
+    </div>
   );
 }
 
