@@ -50,11 +50,13 @@ app.use(cookieParser());
 // Dynamic CORS configuration - Allow all origins everywhere
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    // Also allow all origins in production
-    callback(null, true);
+    // Always allow the origin, whether it exists or not
+    callback(null, origin || true);
   },
-  credentials: true,
+  credentials: function(req, callback) {
+    // Only enable credentials if there's an origin header
+    callback(null, !!req.headers.origin);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
   allowedHeaders: [
     'Content-Type', 
@@ -85,14 +87,19 @@ app.options('*', cors(corsOptions));
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  // Always allow the requesting origin
+  // Always allow the requesting origin (never use * with credentials)
   if (origin) {
     res.header('Access-Control-Allow-Origin', origin);
   } else {
+    // For requests without origin (like Postman), we can't use credentials anyway
     res.header('Access-Control-Allow-Origin', '*');
   }
   
-  res.header('Access-Control-Allow-Credentials', 'true');
+  // Only set credentials to true if we have a specific origin
+  if (origin) {
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Cache-Control, Pragma, User-Agent, Referer');
   res.header('Access-Control-Expose-Headers', 'Set-Cookie, Authorization');
@@ -196,12 +203,48 @@ app.get("/api", (req, res) => {
 
 // CORS test endpoint
 app.get("/api/cors-test", (req, res) => {
+  const origin = req.headers.origin;
   res.json({
     message: "CORS is working!",
-    origin: req.headers.origin || "No origin header",
+    origin: origin || "No origin header",
     timestamp: new Date().toISOString(),
     environment: NODE_ENV,
-    headers: req.headers
+    headers: {
+      origin: origin,
+      userAgent: req.headers['user-agent'],
+      referer: req.headers.referer
+    },
+    corsSettings: {
+      allowOrigin: origin || "*",
+      allowCredentials: !!origin,
+      allowMethods: "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+    }
+  });
+});
+
+// Debug CORS endpoint
+app.get("/api/debug-cors", (req, res) => {
+  const origin = req.headers.origin;
+  console.log("🔍 CORS Debug Request:", {
+    origin,
+    method: req.method,
+    headers: req.headers,
+    url: req.url
+  });
+  
+  res.json({
+    debug: "CORS Debug Information",
+    request: {
+      origin: origin,
+      method: req.method,
+      url: req.url,
+      headers: req.headers
+    },
+    response: {
+      allowOrigin: origin || "*",
+      allowCredentials: !!origin,
+      timestamp: new Date().toISOString()
+    }
   });
 });
 
