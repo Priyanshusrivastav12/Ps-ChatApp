@@ -3,8 +3,7 @@ import useConversation from "../../zustand/useConversation.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import { useTheme } from "../../context/ThemeProvider.jsx";
 import { CiMenuFries } from "react-icons/ci";
-import { IoMoon, IoSunny } from "react-icons/io5";
-import profile from "../../assets/user.jpg";
+import { IoMoon, IoSunny, IoPersonCircle } from "react-icons/io5";
 
 function Chatuser() {
   const { selectedConversation } = useConversation();
@@ -67,22 +66,42 @@ function Chatuser() {
         
         {/* Mobile: Left padding to avoid menu button overlap */}
         <div className="flex items-center space-x-3 sm:space-x-4 relative z-10 w-full lg:pl-0 pl-12 pr-2">
-          {/* Avatar with enhanced styling */}
+          {/* Avatar with enhanced styling - WhatsApp/Instagram Style */}
           <div className="relative flex-shrink-0">
-            <div className={`avatar ${isOnline ? "online" : ""}`}>
-              <div className="w-10 sm:w-12 lg:w-14 rounded-full ring-2 ring-blue-400/30 ring-offset-2 ring-offset-transparent transition-all duration-300">
-                <img src={profile} alt={selectedConversation.fullname} className="rounded-full" />
-              </div>
+            <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full overflow-hidden border-3 transition-all duration-300 ${
+              isOnline 
+                ? 'border-green-500 shadow-lg shadow-green-500/30' 
+                : isDark 
+                  ? 'border-gray-600' 
+                  : 'border-gray-300'
+            }`}>
+              {selectedConversation.avatar ? (
+                <img 
+                  src={selectedConversation.avatar} 
+                  alt={selectedConversation.fullname} 
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" 
+                />
+              ) : (
+                <div className={`w-full h-full flex items-center justify-center transition-colors duration-300 ${
+                  isDark ? 'bg-gray-700' : 'bg-gray-200'
+                }`}>
+                  <IoPersonCircle className={`text-3xl sm:text-4xl lg:text-5xl transition-colors duration-300 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                </div>
+              )}
             </div>
             
-            {/* Online status glow */}
+            {/* Online Status Indicator - WhatsApp Style */}
             {isOnline && (
-              <div className="absolute inset-0 rounded-full bg-green-400/20 blur-sm animate-pulse"></div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-3 border-white shadow-lg">
+                <div className="w-full h-full bg-green-500 rounded-full animate-pulse"></div>
+              </div>
             )}
             
-            {/* Typing indicator */}
+            {/* Typing indicator overlay */}
             {isTyping && (
-              <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
+              <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-2 border-2 border-white shadow-lg">
                 <div className="flex space-x-1">
                   <div className="w-1 h-1 bg-white rounded-full animate-bounce"></div>
                   <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -102,16 +121,11 @@ function Chatuser() {
               {selectedConversation.fullname}
             </h1>
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full transition-all duration-300 flex-shrink-0 ${
-                isOnline 
-                  ? "bg-green-400 shadow-lg shadow-green-400/50 animate-pulse" 
-                  : "bg-gray-500"
-              }`}></div>
               <span className={`text-xs sm:text-sm transition-colors duration-300 truncate ${
                 isTyping 
-                  ? "text-blue-400 animate-pulse" 
+                  ? "text-blue-400 animate-pulse font-medium" 
                   : isOnline 
-                    ? "text-green-400" 
+                    ? "text-green-400 font-medium" 
                     : isDark ? "text-gray-400" : "text-gray-600"
               }`}>
                 {getOnlineUsersStatus(selectedConversation._id)}

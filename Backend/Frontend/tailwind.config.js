@@ -13,6 +13,11 @@ export default {
                 '2xl': 'var(--font-2xl)',
                 '3xl': 'var(--font-3xl)',
             },
+            borderWidth: {
+                '3': '3px',
+                '5': '5px',
+                '6': '6px',
+            },
             colors: {
                 'theme-bg-primary': 'var(--bg-primary)',
                 'theme-bg-secondary': 'var(--bg-secondary)',

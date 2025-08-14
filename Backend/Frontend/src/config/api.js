@@ -22,6 +22,8 @@ export const API_CONFIG = {
       LOGIN: '/api/user/login',
       LOGOUT: '/api/user/logout',
       ALL_USERS: '/api/user/allusers',
+      PROFILE: '/api/user/profile',
+      UPDATE_PROFILE: '/api/user/profile',
     },
     
     // Message endpoints

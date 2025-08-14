@@ -2,7 +2,7 @@ import React from "react";
 import useConversation from "../../zustand/useConversation.js";
 import { useSocketContext } from "../../context/SocketContext.jsx";
 import { useTheme } from "../../context/ThemeProvider.jsx";
-import profile from "../../assets/user.jpg";
+import { IoPersonCircle } from "react-icons/io5";
 
 function User({ user }) {
   const { selectedConversation, setSelectedConversation } = useConversation();
@@ -34,13 +34,39 @@ function User({ user }) {
       onClick={handleUserSelect}
     >
       <div className="flex space-x-3 sm:space-x-4 px-4 sm:px-6 py-3 sm:py-4 relative z-10">
-        <div className={`avatar ${isOnline ? "online" : ""} relative flex-shrink-0`}>
-          <div className="w-10 sm:w-12 rounded-full ring-2 ring-offset-2 ring-offset-transparent transition-all duration-300 group-hover:ring-blue-400/50">
-            <img src={profile} alt={user.fullname} className="rounded-full" />
+        {/* Avatar Container - WhatsApp/Instagram Style */}
+        <div className="relative flex-shrink-0">
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 transition-all duration-300 ${
+            isSelected 
+              ? 'border-blue-500 shadow-lg shadow-blue-500/30' 
+              : isOnline 
+                ? 'border-green-500 shadow-lg shadow-green-500/20' 
+                : isDark 
+                  ? 'border-gray-600 group-hover:border-gray-500' 
+                  : 'border-gray-300 group-hover:border-gray-400'
+          }`}>
+            {user.avatar ? (
+              <img 
+                src={user.avatar} 
+                alt={user.fullname} 
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+              />
+            ) : (
+              <div className={`w-full h-full flex items-center justify-center transition-colors duration-300 ${
+                isDark ? 'bg-gray-700' : 'bg-gray-200'
+              }`}>
+                <IoPersonCircle className={`text-2xl sm:text-3xl transition-colors duration-300 ${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+              </div>
+            )}
           </div>
-          {/* Online status glow */}
+          
+          {/* Online Status Indicator - WhatsApp Style */}
           {isOnline && (
-            <div className="absolute inset-0 rounded-full bg-green-400/20 blur-sm animate-pulse"></div>
+            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-lg animate-pulse">
+              <div className="w-full h-full bg-green-500 rounded-full"></div>
+            </div>
           )}
         </div>
         
@@ -64,15 +90,12 @@ function User({ user }) {
             {user.email}
           </span>
           
-          {/* Status indicator */}
-          <div className="flex items-center mt-1">
-            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mr-2 transition-all duration-300 ${
-              isOnline 
-                ? "bg-green-400 shadow-lg shadow-green-400/50 animate-pulse" 
-                : "bg-gray-500"
-            }`}></div>
+          {/* Status indicator - Simplified */}
+          <div className="flex items-center mt-1 space-x-2">
             <span className={`text-xs transition-colors duration-300 ${
-              isDark ? "text-gray-500" : "text-gray-600"
+              isOnline 
+                ? "text-green-500 font-medium" 
+                : isDark ? "text-gray-500" : "text-gray-600"
             }`}>
               {isOnline ? "Online" : "Offline"}
             </span>

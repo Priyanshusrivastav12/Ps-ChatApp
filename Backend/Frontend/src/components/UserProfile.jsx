@@ -1,11 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { IoClose, IoCamera, IoSave, IoPersonCircle } from 'react-icons/io5';
 import { MdEdit, MdCheck, MdClose } from 'react-icons/md';
 import { useAuth } from '../context/AuthProvider';
+import axios from 'axios';
+import { API_CONFIG } from '../config/api';
+import toast from 'react-hot-toast';
 
 function UserProfile({ isOpen, onClose }) {
-  const [authUser] = useAuth();
+  const [authUser, setAuthUser] = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [profileData, setProfileData] = useState({
     fullname: authUser?.user?.fullname || '',
     bio: authUser?.user?.bio || 'Hey there! I am using ChatApp.',
@@ -22,6 +26,18 @@ function UserProfile({ isOpen, onClose }) {
     { value: 'offline', label: 'Invisible', color: 'bg-gray-500' }
   ];
 
+  // Sync profileData with authUser changes
+  useEffect(() => {
+    if (authUser?.user && !isEditing) {
+      setProfileData({
+        fullname: authUser.user.fullname || '',
+        bio: authUser.user.bio || 'Hey there! I am using ChatApp.',
+        avatar: authUser.user.avatar || null,
+        status: authUser.user.status || 'online'
+      });
+    }
+  }, [authUser, isEditing]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -35,25 +51,41 @@ function UserProfile({ isOpen, onClose }) {
   };
 
   const handleSave = async () => {
+    if (isSaving) return;
+    
+    setIsSaving(true);
     try {
-      // In a real implementation, you would make an API call to update the user profile
-      console.log('Saving profile data:', profileData);
-      
-      // Update localStorage temporarily
-      const updatedUser = {
-        ...authUser,
-        user: {
-          ...authUser.user,
-          ...profileData
+      const response = await axios.put(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.UPDATE_PROFILE}`,
+        profileData,
+        {
+          ...API_CONFIG.AXIOS_CONFIG,
+          withCredentials: true,
         }
-      };
-      localStorage.setItem('ChatApp', JSON.stringify(updatedUser));
+      );
       
-      setIsEditing(false);
-      // You could show a success message here
+      if (response.data && response.data.user) {
+        // Update the auth context with the new user data
+        const updatedAuthUser = {
+          ...authUser,
+          user: response.data.user
+        };
+        
+        // Update localStorage
+        localStorage.setItem('ChatApp', JSON.stringify(updatedAuthUser));
+        
+        // Update auth context
+        setAuthUser(updatedAuthUser);
+        
+        setIsEditing(false);
+        setPreviewAvatar(null);
+        toast.success('Profile updated successfully!');
+      }
     } catch (error) {
       console.error('Error saving profile:', error);
-      // Show error message
+      toast.error(error.response?.data?.error || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -87,16 +119,16 @@ function UserProfile({ isOpen, onClose }) {
         {/* Avatar Section */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-700 border-4 border-gray-600">
+            <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-700 border-4 border-gray-600 shadow-xl">
               {(previewAvatar || profileData.avatar) ? (
                 <img
                   src={previewAvatar || profileData.avatar}
                   alt="Profile"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <IoPersonCircle className="text-gray-400 text-6xl" />
+                <div className="w-full h-full flex items-center justify-center bg-gray-700">
+                  <IoPersonCircle className="text-gray-400 text-8xl" />
                 </div>
               )}
             </div>
@@ -104,9 +136,11 @@ function UserProfile({ isOpen, onClose }) {
             {isEditing && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60"
               >
-                <IoCamera className="text-white text-2xl" />
+                <div className="bg-white rounded-full p-3 shadow-lg">
+                  <IoCamera className="text-gray-800 text-2xl" />
+                </div>
               </button>
             )}
             
@@ -247,10 +281,20 @@ function UserProfile({ isOpen, onClose }) {
               </button>
               <button
                 onClick={handleSave}
-                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
+                disabled={isSaving}
+                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
               >
-                <MdCheck className="text-lg" />
-                <span>Save Changes</span>
+                {isSaving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <MdCheck className="text-lg" />
+                    <span>Save Changes</span>
+                  </>
+                )}
               </button>
             </>
           ) : (
