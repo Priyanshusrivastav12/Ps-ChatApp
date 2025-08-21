@@ -23,9 +23,11 @@ apiClient.interceptors.request.use(
     if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log('🔑 Added Authorization header to request');
+    } else if (!token) {
+      console.log('⚠️ No JWT token found in cookies or localStorage');
     }
     
-    // Ensure credentials are included
+    // Ensure credentials are included for cookie-based auth
     config.withCredentials = true;
     
     return config;
@@ -43,7 +45,11 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      console.log('🔐 Authentication failed - clearing tokens and redirecting');
+      console.log('🔐 Authentication failed - 401 Unauthorized');
+      console.log('🔍 Current tokens:', {
+        cookie: !!Cookies.get('jwt'),
+        localStorage: !!localStorage.getItem('jwt')
+      });
       
       // Clear all authentication data
       Cookies.remove('jwt');
@@ -52,6 +58,7 @@ apiClient.interceptors.response.use(
       
       // Only redirect if not already on login page
       if (!window.location.pathname.includes('/login')) {
+        console.log('🔄 Redirecting to login page');
         window.location.href = '/login';
       }
     }

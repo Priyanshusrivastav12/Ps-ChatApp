@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import useConversation from "../zustand/useConversation.js";
-import axios from "axios";
+import apiClient from "../utils/axios.js";
 import { API_CONFIG } from "../config/api.js";
-
-// Configure axios defaults
-axios.defaults.baseURL = API_CONFIG.BASE_URL;
-axios.defaults.withCredentials = true;
-axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +13,7 @@ const useSendMessage = () => {
       const endpoint = API_CONFIG.ENDPOINTS.MESSAGE.SEND(selectedConversation._id);
       console.log(`📤 Sending message to: ${API_CONFIG.BASE_URL}${endpoint}`);
       
-      const res = await axios.post(endpoint, messageData);
+      const res = await apiClient.post(endpoint, messageData);
       setMessage([...messages, res.data]);
       setLoading(false);
       console.log("✅ Message sent successfully");

@@ -179,7 +179,7 @@ function Login() {
         // Store user data in localStorage
         localStorage.setItem("ChatApp", JSON.stringify(response.data));
         
-        // Also store JWT token if provided in response (fallback for cross-origin issues)
+        // Store JWT token if provided in response (for cross-origin scenarios)
         if (response.data.token) {
           localStorage.setItem("jwt", response.data.token);
           Cookies.set("jwt", response.data.token, { 
@@ -187,6 +187,9 @@ function Login() {
             secure: window.location.protocol === 'https:',
             sameSite: 'none'
           });
+          console.log("🔑 JWT token stored successfully");
+        } else {
+          console.log("⚠️ No token in response, relying on HTTP-only cookie");
         }
         
         setAuthUser(response.data);

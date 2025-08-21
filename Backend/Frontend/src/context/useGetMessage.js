@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useConversation from "../zustand/useConversation.js";
-import axios from "axios";
+import apiClient from "../utils/axios.js";
 import { API_CONFIG } from "../config/api.js";
-
-// Configure axios defaults
-axios.defaults.baseURL = API_CONFIG.BASE_URL;
-axios.defaults.withCredentials = true;
-axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
 
 const useGetMessage = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +15,7 @@ const useGetMessage = () => {
           const endpoint = API_CONFIG.ENDPOINTS.MESSAGE.GET(selectedConversation._id);
           console.log(`💬 Fetching messages from: ${API_CONFIG.BASE_URL}${endpoint}`);
           
-          const res = await axios.get(endpoint);
+          const res = await apiClient.get(endpoint);
           setMessage(res.data);
           setLoading(false);
           console.log(`✅ Fetched ${res.data.length} messages`);
