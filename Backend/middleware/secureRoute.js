@@ -3,8 +3,22 @@ import User from "../models/user.model.js";
 
 const secureRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    // Try to get token from multiple sources
+    let token = req.cookies.jwt;
+    
+    // If no cookie token, check Authorization header
     if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7); // Remove 'Bearer ' prefix
+        console.log("🔑 Token found in Authorization header");
+      }
+    } else {
+      console.log("🍪 Token found in cookies");
+    }
+    
+    if (!token) {
+      console.log("❌ No token found in cookies or Authorization header");
       return res.status(401).json({ error: "No token, authorization denied" });
     }
     

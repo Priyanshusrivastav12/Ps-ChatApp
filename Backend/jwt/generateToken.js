@@ -23,6 +23,9 @@ const createTokenAndSaveCookie = (userId, res) => {
   });
   
   console.log(`🍪 JWT Cookie set - Production: ${isProduction}, Secure: ${isProduction}, SameSite: ${isProduction ? "none" : "lax"}`);
+  
+  // Return the token for cross-origin scenarios
+  return token;
 };
 
 export default createTokenAndSaveCookie;

@@ -20,7 +20,7 @@ export const signup = async (req, res) => {
     });
     await newUser.save();
     if (newUser) {
-      createTokenAndSaveCookie(newUser._id, res);
+      const token = createTokenAndSaveCookie(newUser._id, res);
       res.status(201).json({
         message: "User created successfully",
         user: {
@@ -31,6 +31,7 @@ export const signup = async (req, res) => {
           bio: newUser.bio,
           status: newUser.status,
         },
+        token: token, // Include token in response for cross-origin scenarios
       });
     }
   } catch (error) {
@@ -49,7 +50,10 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid user credential" });
     }
-    createTokenAndSaveCookie(user._id, res);
+    
+    // Generate token and set cookie
+    const token = createTokenAndSaveCookie(user._id, res);
+    
     res.status(201).json({
       message: "User logged in successfully",
       user: {
@@ -60,6 +64,7 @@ export const login = async (req, res) => {
         bio: user.bio,
         status: user.status,
       },
+      token: token, // Include token in response for cross-origin scenarios
     });
   } catch (error) {
     console.log(error);

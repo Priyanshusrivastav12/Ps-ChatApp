@@ -1,4 +1,6 @@
 import axios from "axios";
+import Cookies from "js-cookie";
+import apiClient from "../utils/axios.js";
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthProvider";
@@ -161,9 +163,10 @@ function Login() {
     console.log(`🔐 Attempting login to: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.LOGIN}`);
     
     try {
-      const response = await axios.post(API_CONFIG.ENDPOINTS.USER.LOGIN, userInfo);
+      const response = await apiClient.post(API_CONFIG.ENDPOINTS.USER.LOGIN, userInfo);
       
       if (response.data) {
+        console.log("✅ Login response received:", response.data);
         toast.success("✅ Login successful! Welcome back!");
         
         // Handle remember me functionality
@@ -173,7 +176,19 @@ function Login() {
           localStorage.removeItem('rememberedEmail');
         }
         
+        // Store user data in localStorage
         localStorage.setItem("ChatApp", JSON.stringify(response.data));
+        
+        // Also store JWT token if provided in response (fallback for cross-origin issues)
+        if (response.data.token) {
+          localStorage.setItem("jwt", response.data.token);
+          Cookies.set("jwt", response.data.token, { 
+            expires: 10,
+            secure: window.location.protocol === 'https:',
+            sameSite: 'none'
+          });
+        }
+        
         setAuthUser(response.data);
         handleLoginAttempt(true);
       }
@@ -458,7 +473,10 @@ function Login() {
                       : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
                   }`}
                   disabled={isLocked || isLoading}
-                  onClick={() => toast.info("Google login coming soon!")}
+                  onClick={() => toast("Google login coming soon!", { 
+                    icon: 'ℹ️',
+                    duration: 3000 
+                  })}
                 >
                   <FaGoogle className="text-red-500" />
                   <span>Continue with Google</span>
@@ -471,7 +489,10 @@ function Login() {
                       : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
                   }`}
                   disabled={isLocked || isLoading}
-                  onClick={() => toast.info("GitHub login coming soon!")}
+                  onClick={() => toast("GitHub login coming soon!", { 
+                    icon: 'ℹ️',
+                    duration: 3000 
+                  })}
                 >
                   <FaGithub className={isDark ? 'text-gray-300' : 'text-gray-800'} />
                   <span>Continue with GitHub</span>

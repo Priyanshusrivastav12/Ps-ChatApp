@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import axios from "axios";
+import apiClient from "../utils/axios.js";
 import { API_CONFIG } from "../config/api.js";
-
-// Configure axios defaults
-axios.defaults.baseURL = API_CONFIG.BASE_URL;
-axios.defaults.withCredentials = true;
-axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
 
 function useGetAllUsers() {
   const [allUsers, setAllUsers] = useState([]);
@@ -16,16 +11,18 @@ function useGetAllUsers() {
     const getUsers = async () => {
       setLoading(true);
       try {
-        const token = Cookies.get("jwt");
-        console.log(`👥 Fetching users from: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.ALL_USERS}`);
-        console.log(`🍪 JWT Token exists: ${!!token}`);
+        // Try multiple ways to get the token
+        const cookieToken = Cookies.get("jwt");
+        const localStorageToken = localStorage.getItem("jwt");
+        const userDataRaw = localStorage.getItem("ChatApp");
         
-        const response = await axios.get(API_CONFIG.ENDPOINTS.USER.ALL_USERS, {
-          headers: {
-            ...API_CONFIG.AXIOS_CONFIG.headers,
-          },
-          // Don't send Authorization header, rely on cookies only
-        });
+        console.log(`👥 Fetching users from: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.ALL_USERS}`);
+        console.log(`🍪 JWT Cookie Token exists: ${!!cookieToken}`);
+        console.log(`💾 JWT LocalStorage Token exists: ${!!localStorageToken}`);
+        console.log(`👤 User data exists: ${!!userDataRaw}`);
+        
+        // Use the configured apiClient which will automatically handle authentication
+        const response = await apiClient.get(API_CONFIG.ENDPOINTS.USER.ALL_USERS);
         
         setAllUsers(response.data);
         setLoading(false);
@@ -35,10 +32,7 @@ function useGetAllUsers() {
         console.error("❌ Error response:", error.response?.data);
         console.error("❌ Error status:", error.response?.status);
         setLoading(false);
-        if (error.response?.status === 401) {
-          console.log("🔐 Authentication required - redirecting to login");
-          // Handle authentication error (could redirect to login)
-        }
+        // Error handling is now done by the axios interceptor
       }
     };
     getUsers();
