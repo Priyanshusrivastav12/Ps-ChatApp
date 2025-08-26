@@ -10,8 +10,10 @@ function Chatuser() {
   const { onlineUsers, typingUsers } = useSocketContext();
   const { isDark, toggleTheme } = useTheme();
   
-  // Check if selected user is typing
-  const isTyping = selectedConversation && typingUsers.has(selectedConversation._id);
+  // Check if selected user is typing (only if they're online)
+  const isTyping = selectedConversation && 
+                   typingUsers.has(selectedConversation._id) && 
+                   onlineUsers.includes(selectedConversation._id);
 
   const getOnlineUsersStatus = (userId) => {
     if (isTyping) return "typing...";

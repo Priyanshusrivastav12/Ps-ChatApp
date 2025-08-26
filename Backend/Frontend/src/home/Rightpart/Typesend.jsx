@@ -68,9 +68,13 @@ function Typesend() {
   // Cleanup typing indicator when conversation changes or component unmounts
   useEffect(() => {
     return () => {
-      if (socket && selectedConversation?._id && typingTimeout) {
-        clearTimeout(typingTimeout);
-        socket.emit("stopTyping", { recipientId: selectedConversation._id });
+      if (socket && socket.connected && selectedConversation?._id && typingTimeout) {
+        try {
+          clearTimeout(typingTimeout);
+          socket.emit("stopTyping", { recipientId: selectedConversation._id });
+        } catch (error) {
+          console.error('Error stopping typing on conversation change:', error);
+        }
       }
     };
   }, [selectedConversation?._id]);
@@ -96,10 +100,14 @@ function Typesend() {
     e.preventDefault();
     if (message.trim() && selectedConversation?._id) {
       // Stop typing indicator immediately when sending
-      if (socket && typingTimeout) {
-        clearTimeout(typingTimeout);
-        socket.emit("stopTyping", { recipientId: selectedConversation._id });
-        setTypingTimeout(null);
+      if (socket && socket.connected && typingTimeout) {
+        try {
+          clearTimeout(typingTimeout);
+          socket.emit("stopTyping", { recipientId: selectedConversation._id });
+          setTypingTimeout(null);
+        } catch (error) {
+          console.error('Error stopping typing on message send:', error);
+        }
       }
       
       const messageData = {
@@ -121,20 +129,26 @@ function Typesend() {
   const handleChange = (e) => {
     setMessage(e.target.value);
     
-    // Only emit typing events if there's a selected conversation
-    if (selectedConversation?._id && socket) {
-      // If the user is typing, emit typing event
-      socket.emit("typing", { recipientId: selectedConversation._id });
-      
-      // Clear existing timeout
-      if (typingTimeout) clearTimeout(typingTimeout);
-      
-      // Set new timeout to stop typing after 1 second of inactivity
-      const timeout = setTimeout(() => {
-        socket.emit("stopTyping", { recipientId: selectedConversation._id });
-      }, 1000);
-      
-      setTypingTimeout(timeout);
+    // Only emit typing events if there's a selected conversation and socket connection
+    if (selectedConversation?._id && socket && socket.connected) {
+      try {
+        // If the user is typing, emit typing event
+        socket.emit("typing", { recipientId: selectedConversation._id });
+        
+        // Clear existing timeout
+        if (typingTimeout) clearTimeout(typingTimeout);
+        
+        // Set new timeout to stop typing after 1 second of inactivity
+        const timeout = setTimeout(() => {
+          if (socket && socket.connected && selectedConversation?._id) {
+            socket.emit("stopTyping", { recipientId: selectedConversation._id });
+          }
+        }, 1000);
+        
+        setTypingTimeout(timeout);
+      } catch (error) {
+        console.error('Error emitting typing event:', error);
+      }
     }
   };
 

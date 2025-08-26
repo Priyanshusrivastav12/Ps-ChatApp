@@ -52,21 +52,36 @@ export const SocketProvider = ({ children }) => {
       socketInstance.on("getOnlineUsers", (users) => {
         setOnlineUsers(users);
         console.log(`👥 Online users updated: ${users.length} users`);
+        
+        // Clean up typing indicators for users who went offline
+        setTypingUsers(prev => {
+          const newSet = new Set();
+          prev.forEach(userId => {
+            if (users.includes(userId)) {
+              newSet.add(userId);
+            }
+          });
+          return newSet;
+        });
       });
 
-      // Handle typing indicators
+      // Handle typing indicators with error handling
       socketInstance.on("userTyping", ({ senderId }) => {
-        console.log(`⌨️ User ${senderId} is typing`);
-        setTypingUsers(prev => new Set([...prev, senderId]));
+        if (senderId && senderId !== authUser.user._id) {
+          console.log(`⌨️ User ${senderId} is typing`);
+          setTypingUsers(prev => new Set([...prev, senderId]));
+        }
       });
 
       socketInstance.on("userStoppedTyping", ({ senderId }) => {
-        console.log(`⌨️ User ${senderId} stopped typing`);
-        setTypingUsers(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(senderId);
-          return newSet;
-        });
+        if (senderId) {
+          console.log(`⌨️ User ${senderId} stopped typing`);
+          setTypingUsers(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(senderId);
+            return newSet;
+          });
+        }
       });
       
       return () => {
