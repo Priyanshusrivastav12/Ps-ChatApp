@@ -20,13 +20,13 @@ function Left() {
   const themeClasses = getThemeClasses(isDark);
 
   return (
-    <div className={`w-full h-screen flex flex-col overflow-hidden ${componentClasses.sidebar}`}>
+    <div className={`w-full h-screen flex flex-col overflow-hidden ${componentClasses.sidebar} pt-2 lg:pt-0`}>
       {/* Header - Fixed height with profile, theme toggle, and settings */}
       <div className={`flex-shrink-0 h-[8vh] px-4 py-3 border-b flex items-center justify-between ${themeClasses.border.primary} bg-gradient-to-r relative overflow-hidden ${
         isDark 
           ? 'from-slate-800 to-slate-700' 
           : 'from-gray-100 to-gray-50'
-      } transition-colors duration-200`}>
+      } transition-colors duration-200 mt-8 lg:mt-0`}>
         {/* Accent line */}
         <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${
           isDark 
@@ -35,7 +35,7 @@ function Left() {
         }`}></div>
         
         {/* Mobile menu button */}
-        <div className="lg:hidden">
+        <div className="lg:hidden flex items-center">
           <button
             className={`p-2 rounded-lg transition-colors duration-200 ${themeClasses.button.ghost}`}
             onClick={() => document.getElementById('my-drawer-2').checked = !document.getElementById('my-drawer-2').checked}
@@ -44,8 +44,8 @@ function Left() {
           </button>
         </div>
         
-        {/* App title for mobile */}
-        <h1 className={`lg:hidden text-xl font-bold ${themeClasses.text.primary} transition-colors duration-200`}>
+        {/* App title for mobile - centered with proper spacing */}
+        <h1 className={`lg:hidden text-xl font-bold ${themeClasses.text.primary} transition-colors duration-200 flex-1 text-center pr-12`}>
           ChatApp
         </h1>
           

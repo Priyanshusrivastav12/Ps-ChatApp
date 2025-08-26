@@ -21,29 +21,43 @@ function Chatuser() {
   const isOnline = onlineUsers.includes(selectedConversation._id);
 
   return (
-    <div className={`relative glass-effect border-b shadow-lg transition-colors duration-200 ${
-      isDark ? 'border-white/10' : 'border-gray-200'
-    }`}>
+    <div 
+      className="relative border-b shadow-lg transition-colors duration-200 overflow-hidden"
+      style={{
+        background: isDark 
+          ? 'linear-gradient(to right, rgb(71 85 105), rgb(100 116 139))' 
+          : 'linear-gradient(to right, rgb(239 246 255), rgb(238 242 255), rgb(243 232 255))',
+        borderColor: isDark ? 'rgba(148 163 184, 0.5)' : 'rgba(59 130 246, 0.6)'
+      }}
+    >
       {/* Mobile menu button - positioned to avoid overlap */}
       <label
         htmlFor="my-drawer-2"
-        className={`btn btn-ghost drawer-button lg:hidden absolute left-2 top-1/2 transform -translate-y-1/2 z-30 glass-effect w-10 h-10 min-h-10 p-2 ${
-          isDark ? 'text-white' : 'text-gray-900'
-        }`}
+        className="btn btn-ghost drawer-button lg:hidden absolute left-2 top-1/2 transform -translate-y-1/2 z-30 w-10 h-10 min-h-10 p-2 transition-all duration-200"
+        style={{
+          color: isDark ? '#ffffff' : '#1f2937',
+          backgroundColor: 'transparent'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = isDark ? 'rgba(148, 163, 184, 0.3)' : 'rgba(59, 130, 246, 0.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = 'transparent';
+        }}
       >
         <CiMenuFries className="text-lg" />
       </label>
       
-      <div className="flex items-center justify-center h-[8vh] px-4 sm:px-6 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className={`absolute inset-0 transition-colors duration-200 ${
-          isDark 
-            ? 'bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50' 
-            : 'bg-gradient-to-r from-gray-100/50 via-gray-50/50 to-gray-100/50'
-        }`}></div>
-        
-        {/* Animated accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60"></div>
+      <div className="flex items-center justify-center h-[8vh] px-4 sm:px-6 relative">
+        {/* Animated accent line - consistent across all devices */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-0.5 transition-colors duration-300"
+          style={{
+            background: isDark 
+              ? 'linear-gradient(to right, rgb(96 165 250), rgb(168 85 247), rgb(34 197 94))' 
+              : 'linear-gradient(to right, rgb(59 130 246), rgb(99 102 241), rgb(168 85 247))'
+          }}
+        ></div>
         
         {/* Mobile: Left padding to avoid menu button overlap */}
         <div className="flex items-center space-x-3 sm:space-x-4 relative z-10 w-full lg:pl-0 pl-12 pr-20 sm:pr-32">
@@ -117,11 +131,17 @@ function Chatuser() {
           {/* Quick theme toggle button */}
           <button
             onClick={toggleTheme}
-            className={`hidden sm:flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110 ${
-              isDark 
-                ? 'text-yellow-400 hover:bg-yellow-400/20' 
-                : 'text-blue-600 hover:bg-blue-600/20'
-            }`}
+            className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 hover:scale-110"
+            style={{
+              color: isDark ? '#facc15' : '#2563eb',
+              backgroundColor: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = isDark ? 'rgba(250, 204, 21, 0.2)' : 'rgba(37, 99, 235, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+            }}
             title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
           >
             {isDark ? <IoSunny className="text-lg" /> : <IoMoon className="text-lg" />}

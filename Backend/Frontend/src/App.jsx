@@ -48,13 +48,13 @@ function App() {
                     className="drawer-overlay"
                   ></label>
                   <div className={`min-h-full w-80 text-base-content relative ${componentClasses.sidebar}`}>
-                    {/* Mobile close button - moved to top-left to avoid overlap with settings */}
-                    <div className="lg:hidden absolute top-4 left-4 z-20">
+                    {/* Mobile close button - positioned to avoid overlap with hamburger */}
+                    <div className="lg:hidden absolute top-2 right-2 z-30">
                       <label
                         htmlFor="my-drawer-2"
                         className={`btn btn-sm btn-circle btn-ghost ${
                           isDark ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-900/10'
-                        } transition-colors duration-200`}
+                        } transition-colors duration-200 shadow-lg`}
                       >
                         ✕
                       </label>
