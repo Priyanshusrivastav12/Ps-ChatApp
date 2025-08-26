@@ -8,14 +8,18 @@ import LoginComparison from "./components/LoginComparison"; // Comparison compon
 import NotificationSystem from "./components/NotificationSystem";
 import { useAuth } from "./context/AuthProvider";
 import { useTheme } from "./context/ThemeProvider";
+import { getComponentClasses } from "./utils/theme";
 import { Toaster } from "react-hot-toast";
 
 import { Navigate, Route, Routes } from "react-router-dom";
 
 function App() {
   const [authUser, setAuthUser] = useAuth();
-  const { isDark } = useTheme();
+  const { isDark, currentTheme } = useTheme();
+  const componentClasses = getComponentClasses(isDark);
+  
   console.log(authUser);
+  
   return (
     <>
       <Routes>
@@ -23,9 +27,7 @@ function App() {
           path="/"
           element={
             authUser ? (
-              <div className={`drawer lg:drawer-open h-screen transition-colors duration-200 ${
-                isDark ? 'bg-gray-900' : 'bg-gray-100'
-              }`}>
+              <div className={`drawer lg:drawer-open h-screen ${componentClasses.page}`}>
                 <input
                   id="my-drawer-2"
                   name="drawer-toggle"
@@ -45,16 +47,14 @@ function App() {
                     aria-label="close sidebar"
                     className="drawer-overlay"
                   ></label>
-                  <div className={`min-h-full w-80 text-base-content relative transition-colors duration-200 ${
-                    isDark ? 'bg-slate-900' : 'bg-white'
-                  }`}>
+                  <div className={`min-h-full w-80 text-base-content relative ${componentClasses.sidebar}`}>
                     {/* Mobile close button - moved to top-left to avoid overlap with settings */}
                     <div className="lg:hidden absolute top-4 left-4 z-20">
                       <label
                         htmlFor="my-drawer-2"
-                        className={`btn btn-sm btn-circle btn-ghost transition-colors duration-200 ${
+                        className={`btn btn-sm btn-circle btn-ghost ${
                           isDark ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-900/10'
-                        }`}
+                        } transition-colors duration-200`}
                       >
                         ✕
                       </label>
@@ -92,9 +92,30 @@ function App() {
         toastOptions={{
           className: isDark ? 'dark' : '',
           style: {
-            background: isDark ? '#374151' : '#ffffff',
-            color: isDark ? '#f9fafb' : '#111827',
+            background: isDark ? '#334155' : '#ffffff',
+            color: isDark ? '#f8fafc' : '#0f172a',
+            border: isDark ? '1px solid #475569' : '1px solid #e2e8f0',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            boxShadow: isDark 
+              ? '0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)' 
+              : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
           },
+          success: {
+            style: {
+              background: isDark ? '#065f46' : '#d1fae5',
+              color: isDark ? '#6ee7b7' : '#047857',
+              border: isDark ? '1px solid #059669' : '1px solid #10b981'
+            }
+          },
+          error: {
+            style: {
+              background: isDark ? '#7f1d1d' : '#fee2e2',
+              color: isDark ? '#fca5a5' : '#dc2626',
+              border: isDark ? '1px solid #dc2626' : '1px solid #ef4444'
+            }
+          }
         }}
       />
     </>

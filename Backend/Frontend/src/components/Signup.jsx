@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
+import { useTheme } from "../context/ThemeProvider";
+import { getComponentClasses, getThemeClasses } from "../utils/theme";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { API_CONFIG } from "../config/api.js";
+import ThemeToggle from "./ThemeToggle";
 import { 
   FaEye, 
   FaEyeSlash, 
@@ -23,11 +26,15 @@ axios.defaults.timeout = API_CONFIG.AXIOS_CONFIG.timeout;
 
 function Signup() {
   const [authUser, setAuthUser] = useAuth();
+  const { isDark, currentTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const nameInputRef = useRef(null);
+  
+  const componentClasses = getComponentClasses(isDark);
+  const themeClasses = getThemeClasses(isDark);
 
   const {
     register,
@@ -149,27 +156,34 @@ function Signup() {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className={`min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 ${componentClasses.page}`}>
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle size="md" />
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+          <div className="mx-auto h-12 w-12 rounded-full flex items-center justify-center mb-4 bg-blue-600">
             <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.172-.266l-5.855 1.955A1.002 1.002 0 014 20.723V17.5A8 8 0 0113 4c4.418 0 8 3.582 8 8z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className={`text-3xl font-bold ${themeClasses.text.primary} transition-colors duration-200`}>
+            Create your account
+          </h2>
+          <p className={`mt-2 text-sm ${themeClasses.text.secondary} transition-colors duration-200`}>
             Join thousands of users already chatting
           </p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm rounded-lg sm:px-10 border border-gray-200">
+        <div className={`py-8 px-4 shadow-sm rounded-lg sm:px-10 border ${componentClasses.card} transition-colors duration-200`}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Full Name Field */}
+            {/* Full Name Field */}
             <div>
-              <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="fullname" className={`block text-sm font-medium mb-1 ${themeClasses.text.secondary} transition-colors duration-200`}>
                 Full Name
               </label>
               <div className="relative">
@@ -178,16 +192,18 @@ function Signup() {
                   ref={nameInputRef}
                   type="text"
                   placeholder="Enter your full name"
-                  className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    errors.fullname ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                  } ${fullnameValue ? 'bg-blue-50 border-blue-200' : ''}`}
+                  className={`${componentClasses.input} pr-10 ${
+                    errors.fullname 
+                      ? 'border-red-300 bg-red-50' 
+                      : fullnameValue ? (isDark ? 'bg-slate-600 border-blue-400' : 'bg-blue-50 border-blue-200') : ''
+                  }`}
                   {...register("fullname", { 
                     validate: validateFullName,
                     onChange: () => errors.fullname && clearErrors('fullname')
                   })}
                 />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                  <svg className={`h-5 w-5 ${themeClasses.text.tertiary}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
@@ -204,7 +220,7 @@ function Signup() {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className={`block text-sm font-medium mb-1 ${themeClasses.text.secondary} transition-colors duration-200`}>
                 Email Address
               </label>
               <div className="relative">
@@ -212,16 +228,18 @@ function Signup() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                  } ${emailValue ? 'bg-blue-50 border-blue-200' : ''}`}
+                  className={`${componentClasses.input} pr-10 ${
+                    errors.email 
+                      ? 'border-red-300 bg-red-50' 
+                      : emailValue ? (isDark ? 'bg-slate-600 border-blue-400' : 'bg-blue-50 border-blue-200') : ''
+                  }`}
                   {...register("email", { 
                     validate: validateEmail,
                     onChange: () => errors.email && clearErrors('email')
                   })}
                 />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                  <svg className={`h-5 w-5 ${themeClasses.text.tertiary}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                   </svg>
                 </div>
@@ -238,7 +256,7 @@ function Signup() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className={`block text-sm font-medium mb-1 ${themeClasses.text.secondary} transition-colors duration-200`}>
                 Password
               </label>
               <div className="relative">
@@ -246,9 +264,11 @@ function Signup() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                  } ${password ? 'bg-blue-50 border-blue-200' : ''}`}
+                  className={`${componentClasses.input} pr-12 ${
+                    errors.password 
+                      ? 'border-red-300 bg-red-50' 
+                      : password ? (isDark ? 'bg-slate-600 border-blue-400' : 'bg-blue-50 border-blue-200') : ''
+                  }`}
                   {...register("password", { 
                     validate: validatePassword,
                     onChange: () => errors.password && clearErrors('password')
@@ -256,17 +276,17 @@ function Signup() {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className={`absolute inset-y-0 right-0 pr-4 flex items-center transition-colors ${themeClasses.text.tertiary} hover:${themeClasses.text.secondary}`}
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
                     </svg>
                   ) : (
-                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -278,12 +298,12 @@ function Signup() {
               {password && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-500">Password strength:</span>
+                    <span className={`text-xs ${themeClasses.text.tertiary} transition-colors duration-200`}>Password strength:</span>
                     <span className={`text-xs font-medium ${getPasswordStrengthText().color}`}>
                       {getPasswordStrengthText().text}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className={`w-full rounded-full h-2 ${themeClasses.bg.tertiary}`}>
                     <div 
                       className={`h-2 rounded-full transition-all duration-300 ${
                         passwordStrength <= 1 ? 'bg-red-500' :
@@ -310,7 +330,7 @@ function Signup() {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="confirmPassword" className={`block text-sm font-medium mb-1 ${themeClasses.text.secondary} transition-colors duration-200`}>
                 Confirm Password
               </label>
               <div className="relative">
@@ -318,9 +338,11 @@ function Signup() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                  } ${confirmPassword ? 'bg-blue-50 border-blue-200' : ''}`}
+                  className={`${componentClasses.input} pr-12 ${
+                    errors.confirmPassword 
+                      ? 'border-red-300 bg-red-50' 
+                      : confirmPassword ? (isDark ? 'bg-slate-600 border-blue-400' : 'bg-blue-50 border-blue-200') : ''
+                  }`}
                   {...register("confirmPassword", { 
                     validate: validatePasswordMatch,
                     onChange: () => errors.confirmPassword && clearErrors('confirmPassword')
@@ -328,17 +350,17 @@ function Signup() {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className={`absolute inset-y-0 right-0 pr-4 flex items-center transition-colors ${themeClasses.text.tertiary} hover:${themeClasses.text.secondary}`}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   tabIndex={-1}
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? (
-                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
                     </svg>
                   ) : (
-                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -399,11 +421,11 @@ function Signup() {
 
             {/* Login Link */}
             <div className="text-center">
-              <p className="text-sm text-gray-600">
+              <p className={`text-sm ${themeClasses.text.secondary} transition-colors duration-200`}>
                 Already have an account?{' '}
                 <Link 
                   to="/login" 
-                  className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                  className={`font-medium transition-colors duration-200 ${themeClasses.accent} hover:opacity-80`}
                 >
                   Sign in instead
                 </Link>

@@ -46,16 +46,24 @@ io.on("connection", (socket) => {
 
   // Handle typing events
   socket.on("typing", ({ recipientId }) => {
+    console.log(`⌨️ User ${userId} is typing to ${recipientId}`);
     const recipientSocketId = users[recipientId];
     if (recipientSocketId) {
+      console.log(`📤 Sending userTyping event to ${recipientId} (socketId: ${recipientSocketId})`);
       io.to(recipientSocketId).emit("userTyping", { senderId: userId });
+    } else {
+      console.log(`❌ Recipient ${recipientId} not found in users`);
     }
   });
 
   socket.on("stopTyping", ({ recipientId }) => {
+    console.log(`⌨️ User ${userId} stopped typing to ${recipientId}`);
     const recipientSocketId = users[recipientId];
     if (recipientSocketId) {
+      console.log(`📤 Sending userStoppedTyping event to ${recipientId} (socketId: ${recipientSocketId})`);
       io.to(recipientSocketId).emit("userStoppedTyping", { senderId: userId });
+    } else {
+      console.log(`❌ Recipient ${recipientId} not found in users`);
     }
   });
 

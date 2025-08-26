@@ -13,6 +13,7 @@ export const useSocketContext = () => {
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [typingUsers, setTypingUsers] = useState(new Set());
   const [authUser] = useAuth();
 
   useEffect(() => {
@@ -52,6 +53,21 @@ export const SocketProvider = ({ children }) => {
         setOnlineUsers(users);
         console.log(`👥 Online users updated: ${users.length} users`);
       });
+
+      // Handle typing indicators
+      socketInstance.on("userTyping", ({ senderId }) => {
+        console.log(`⌨️ User ${senderId} is typing`);
+        setTypingUsers(prev => new Set([...prev, senderId]));
+      });
+
+      socketInstance.on("userStoppedTyping", ({ senderId }) => {
+        console.log(`⌨️ User ${senderId} stopped typing`);
+        setTypingUsers(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(senderId);
+          return newSet;
+        });
+      });
       
       return () => {
         console.log('🔌 Closing Socket.IO connection');
@@ -67,7 +83,7 @@ export const SocketProvider = ({ children }) => {
   }, [authUser]);
 
   return (
-    <socketContext.Provider value={{ socket, onlineUsers }}>
+    <socketContext.Provider value={{ socket, onlineUsers, typingUsers }}>
       {children}
     </socketContext.Provider>
   );

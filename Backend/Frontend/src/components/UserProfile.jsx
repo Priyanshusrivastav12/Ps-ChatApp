@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IoClose, IoCamera, IoSave, IoPersonCircle } from 'react-icons/io5';
 import { MdEdit, MdCheck, MdClose } from 'react-icons/md';
 import { useAuth } from '../context/AuthProvider';
+import useBodyScrollLock from '../hooks/useBodyScrollLock';
 import axios from 'axios';
 import { API_CONFIG } from '../config/api';
 import toast from 'react-hot-toast';
 
 function UserProfile({ isOpen, onClose }) {
   const [authUser, setAuthUser] = useAuth();
+  useBodyScrollLock(isOpen);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -37,6 +39,20 @@ function UserProfile({ isOpen, onClose }) {
       });
     }
   }, [authUser, isEditing]);
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, onClose]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -102,24 +118,37 @@ function UserProfile({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-start justify-start p-2 sm:p-4 overflow-y-auto"
+      onClick={handleBackdropClick}
+      style={{ position: 'fixed' }}
+    >
+      <div 
+        className="bg-gray-900 rounded-xl shadow-2xl w-full sm:w-80 md:w-96 ml-0 sm:ml-4 mt-2 sm:mt-4 p-3 sm:p-4 relative animate-in slide-in-from-left-2 duration-300 max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto max-w-sm mx-auto sm:mx-0"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Profile Settings</h2>
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="text-base sm:text-lg font-bold text-white">Profile</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-800 rounded-lg"
           >
-            <IoClose className="text-2xl" />
+            <IoClose className="text-lg sm:text-xl" />
           </button>
         </div>
 
         {/* Avatar Section */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-4 sm:mb-6">
           <div className="relative group">
-            <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-700 border-4 border-gray-600 shadow-xl">
+            <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full overflow-hidden bg-gray-700 border-3 border-gray-600 shadow-lg">
               {(previewAvatar || profileData.avatar) ? (
                 <img
                   src={previewAvatar || profileData.avatar}
@@ -128,7 +157,7 @@ function UserProfile({ isOpen, onClose }) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                  <IoPersonCircle className="text-gray-400 text-8xl" />
+                  <IoPersonCircle className="text-gray-400 text-5xl sm:text-6xl" />
                 </div>
               )}
             </div>
@@ -138,8 +167,8 @@ function UserProfile({ isOpen, onClose }) {
                 onClick={() => fileInputRef.current?.click()}
                 className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60"
               >
-                <div className="bg-white rounded-full p-3 shadow-lg">
-                  <IoCamera className="text-gray-800 text-2xl" />
+                <div className="bg-white rounded-full p-1.5 sm:p-2 shadow-lg">
+                  <IoCamera className="text-gray-800 text-base sm:text-lg" />
                 </div>
               </button>
             )}
@@ -153,17 +182,17 @@ function UserProfile({ isOpen, onClose }) {
             />
           </div>
           
-          <h3 className="text-white text-xl font-semibold mt-3">
+          <h3 className="text-white text-base sm:text-lg font-semibold mt-2">
             {profileData.fullname}
           </h3>
-          <p className="text-gray-400 text-sm">{authUser?.user?.email}</p>
+          <p className="text-gray-400 text-xs sm:text-sm">{authUser?.user?.email}</p>
         </div>
 
         {/* Profile Fields */}
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4">
           {/* Full Name */}
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
               Display Name
             </label>
             {isEditing ? (
@@ -171,11 +200,11 @@ function UserProfile({ isOpen, onClose }) {
                 type="text"
                 value={profileData.fullname}
                 onChange={(e) => setProfileData(prev => ({ ...prev, fullname: e.target.value }))}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 text-xs sm:text-sm"
                 placeholder="Enter your display name"
               />
             ) : (
-              <div className="px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white">
+              <div className="px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white text-xs sm:text-sm">
                 {profileData.fullname}
               </div>
             )}
@@ -183,20 +212,20 @@ function UserProfile({ isOpen, onClose }) {
 
           {/* Bio */}
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
               Bio
             </label>
             {isEditing ? (
               <textarea
                 value={profileData.bio}
                 onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 resize-none"
-                rows="3"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 resize-none text-xs sm:text-sm"
+                rows="2"
                 placeholder="Tell us about yourself..."
                 maxLength="200"
               />
             ) : (
-              <div className="px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white min-h-[80px]">
+              <div className="px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white min-h-[50px] sm:min-h-[60px] text-xs sm:text-sm">
                 {profileData.bio}
               </div>
             )}
@@ -209,15 +238,15 @@ function UserProfile({ isOpen, onClose }) {
 
           {/* Status */}
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
               Status
             </label>
             {isEditing ? (
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 {statusOptions.map((option) => (
                   <label
                     key={option.value}
-                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-center p-2 rounded-lg cursor-pointer transition-colors ${
                       profileData.status === option.value
                         ? 'bg-blue-600/20 border border-blue-500/50'
                         : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50'
@@ -231,17 +260,17 @@ function UserProfile({ isOpen, onClose }) {
                       onChange={(e) => setProfileData(prev => ({ ...prev, status: e.target.value }))}
                       className="sr-only"
                     />
-                    <div className={`w-3 h-3 rounded-full ${option.color} mr-3`}></div>
-                    <span className="text-white">{option.label}</span>
+                    <div className={`w-2 h-2 rounded-full ${option.color} mr-2`}></div>
+                    <span className="text-white text-xs sm:text-sm">{option.label}</span>
                   </label>
                 ))}
               </div>
             ) : (
-              <div className="flex items-center px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <div className={`w-3 h-3 rounded-full mr-3 ${
+              <div className="flex items-center px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <div className={`w-2 h-2 rounded-full mr-2 ${
                   statusOptions.find(opt => opt.value === profileData.status)?.color
                 }`}></div>
-                <span className="text-white">
+                <span className="text-white text-xs sm:text-sm">
                   {statusOptions.find(opt => opt.value === profileData.status)?.label}
                 </span>
               </div>
@@ -250,17 +279,17 @@ function UserProfile({ isOpen, onClose }) {
 
           {/* Account Info */}
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
               Account Information
             </label>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <span className="text-gray-300">Email</span>
-                <span className="text-white">{authUser?.user?.email}</span>
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="flex justify-between items-center px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <span className="text-gray-300 text-xs sm:text-sm">Email</span>
+                <span className="text-white text-xs sm:text-sm truncate ml-2">{authUser?.user?.email}</span>
               </div>
-              <div className="flex justify-between items-center px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <span className="text-gray-300">Member since</span>
-                <span className="text-white">
+              <div className="flex justify-between items-center px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <span className="text-gray-300 text-xs sm:text-sm">Member since</span>
+                <span className="text-white text-xs sm:text-sm">
                   {new Date(authUser?.user?.createdAt).toLocaleDateString()}
                 </span>
               </div>
@@ -269,30 +298,30 @@ function UserProfile({ isOpen, onClose }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-3 mt-8">
+        <div className="flex space-x-2 mt-4 sm:mt-6">
           {isEditing ? (
             <>
               <button
                 onClick={handleCancel}
-                className="flex-1 px-4 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2"
+                className="flex-1 px-3 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-1 text-xs sm:text-sm"
               >
-                <MdClose className="text-lg" />
+                <MdClose className="text-base sm:text-lg" />
                 <span>Cancel</span>
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
+                className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors flex items-center justify-center space-x-1 text-xs sm:text-sm"
               >
                 {isSaving ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Saving...</span>
                   </>
                 ) : (
                   <>
-                    <MdCheck className="text-lg" />
-                    <span>Save Changes</span>
+                    <MdCheck className="text-base sm:text-lg" />
+                    <span>Save</span>
                   </>
                 )}
               </button>
@@ -300,9 +329,9 @@ function UserProfile({ isOpen, onClose }) {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-1 text-xs sm:text-sm"
             >
-              <MdEdit className="text-lg" />
+              <MdEdit className="text-base sm:text-lg" />
               <span>Edit Profile</span>
             </button>
           )}

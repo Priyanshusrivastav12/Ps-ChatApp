@@ -7,30 +7,11 @@ import { IoMoon, IoSunny, IoPersonCircle } from "react-icons/io5";
 
 function Chatuser() {
   const { selectedConversation } = useConversation();
-  const { onlineUsers, socket } = useSocketContext();
+  const { onlineUsers, typingUsers } = useSocketContext();
   const { isDark, toggleTheme } = useTheme();
-  const [isTyping, setIsTyping] = useState(false);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("userTyping", ({ senderId }) => {
-      if (senderId === selectedConversation._id) {
-        setIsTyping(true);
-      }
-    });
-
-    socket.on("userStoppedTyping", ({ senderId }) => {
-      if (senderId === selectedConversation._id) {
-        setIsTyping(false);
-      }
-    });
-
-    return () => {
-      socket.off("userTyping");
-      socket.off("userStoppedTyping");
-    };
-  }, [socket, selectedConversation]);
+  
+  // Check if selected user is typing
+  const isTyping = selectedConversation && typingUsers.has(selectedConversation._id);
 
   const getOnlineUsersStatus = (userId) => {
     if (isTyping) return "typing...";
@@ -65,10 +46,10 @@ function Chatuser() {
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60"></div>
         
         {/* Mobile: Left padding to avoid menu button overlap */}
-        <div className="flex items-center space-x-3 sm:space-x-4 relative z-10 w-full lg:pl-0 pl-12 pr-2">
+        <div className="flex items-center space-x-3 sm:space-x-4 relative z-10 w-full lg:pl-0 pl-12 pr-20 sm:pr-32">
           {/* Avatar with enhanced styling - WhatsApp/Instagram Style */}
           <div className="relative flex-shrink-0">
-            <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full overflow-hidden border-3 transition-all duration-300 ${
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 sm:border-3 transition-all duration-300 ${
               isOnline 
                 ? 'border-green-500 shadow-lg shadow-green-500/30' 
                 : isDark 
@@ -85,7 +66,7 @@ function Chatuser() {
                 <div className={`w-full h-full flex items-center justify-center transition-colors duration-300 ${
                   isDark ? 'bg-gray-700' : 'bg-gray-200'
                 }`}>
-                  <IoPersonCircle className={`text-3xl sm:text-4xl lg:text-5xl transition-colors duration-300 ${
+                  <IoPersonCircle className={`text-2xl sm:text-3xl md:text-4xl transition-colors duration-300 ${
                     isDark ? 'text-gray-400' : 'text-gray-500'
                   }`} />
                 </div>
@@ -94,15 +75,15 @@ function Chatuser() {
             
             {/* Online Status Indicator - WhatsApp Style */}
             {isOnline && (
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-3 border-white shadow-lg">
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-green-500 rounded-full border-2 border-white shadow-lg">
                 <div className="w-full h-full bg-green-500 rounded-full animate-pulse"></div>
               </div>
             )}
             
             {/* Typing indicator overlay */}
             {isTyping && (
-              <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-2 border-2 border-white shadow-lg">
-                <div className="flex space-x-1">
+              <div className="absolute -bottom-0.5 -right-0.5 bg-blue-500 rounded-full p-1 sm:p-1.5 border-2 border-white shadow-lg">
+                <div className="flex space-x-0.5">
                   <div className="w-1 h-1 bg-white rounded-full animate-bounce"></div>
                   <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                   <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
@@ -113,7 +94,7 @@ function Chatuser() {
           
           {/* User info - responsive text sizing */}
           <div className="flex-1 min-w-0">
-            <h1 className={`text-base sm:text-lg lg:text-xl font-semibold truncate transition-colors duration-200 ${
+            <h1 className={`text-sm sm:text-base md:text-lg font-semibold truncate transition-colors duration-200 ${
               isDark 
                 ? 'text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text' 
                 : 'text-gray-900 bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text'
@@ -145,18 +126,6 @@ function Chatuser() {
           >
             {isDark ? <IoSunny className="text-lg" /> : <IoMoon className="text-lg" />}
           </button>
-          
-          {/* Activity indicator - hidden on small screens to save space */}
-          <div className="hidden md:flex flex-col items-center space-y-1 flex-shrink-0">
-            <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              isOnline ? "bg-green-400 animate-pulse" : "bg-gray-500"
-            }`}></div>
-            <div className={`text-xs transition-colors duration-200 ${
-              isDark ? 'text-gray-400' : 'text-gray-600'
-            }`}>
-              {isOnline ? "●" : "○"}
-            </div>
-          </div>
         </div>
       </div>
     </div>

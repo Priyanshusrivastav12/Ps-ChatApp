@@ -3,10 +3,17 @@ import Message from "./Message";
 import useGetMessage from "../../context/useGetMessage.js";
 import LoadingDots from "../../components/LoadingDots.jsx";
 import useGetSocketMessage from "../../context/useGetSocketMessage.js";
+import TypingIndicator from "../../components/TypingIndicator.jsx";
+import { useSocketContext } from "../../context/SocketContext.jsx";
+import useConversation from "../../zustand/useConversation.js";
+import useGetAllUsers from "../../context/useGetAllUsers.jsx";
 
 const Messages = forwardRef((props, ref) => {
   const { loading, messages } = useGetMessage();
   useGetSocketMessage(); // listing incoming messages
+  const { typingUsers } = useSocketContext();
+  const { selectedConversation } = useConversation();
+  const { allUsers } = useGetAllUsers();
 
   const lastMsgRef = useRef();
   const messagesContainerRef = useRef();
@@ -15,6 +22,13 @@ const Messages = forwardRef((props, ref) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollTimeoutRef = useRef();
   const lastScrollTop = useRef(0);
+
+  // Check if the selected conversation user is typing
+  // Note: typingUsers contains the sender IDs of users who are typing
+  const isSelectedUserTyping = selectedConversation && typingUsers.has(selectedConversation._id);
+  
+  // Get the typing user's name
+  const typingUserName = isSelectedUserTyping ? selectedConversation.fullname : null;
 
   console.log('Messages component state:', {
     messagesLength: messages.length,
@@ -119,7 +133,23 @@ const Messages = forwardRef((props, ref) => {
       
       return () => clearTimeout(timer);
     }
-  }, [messages, shouldAutoScroll, isUserScrolling]);
+  }, [messages, shouldAutoScroll, isUserScrolling, isSelectedUserTyping]); // Added isSelectedUserTyping
+
+  // Auto-scroll when typing indicator appears/disappears
+  useEffect(() => {
+    if (isSelectedUserTyping && shouldAutoScroll && !isUserScrolling) {
+      const timer = setTimeout(() => {
+        if (messagesContainerRef.current && shouldAutoScroll && !isUserScrolling) {
+          messagesContainerRef.current.scrollTo({
+            top: messagesContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSelectedUserTyping, shouldAutoScroll, isUserScrolling]);
 
   // Initial scroll to bottom on mount - only for new conversations
   useEffect(() => {
@@ -202,6 +232,14 @@ const Messages = forwardRef((props, ref) => {
                   <Message message={message} />
                 </div>
               ))}
+              
+              {/* Typing Indicator */}
+              {isSelectedUserTyping && (
+                <div className="typing-indicator-container animate-in slide-in-from-bottom-2 duration-300">
+                  <TypingIndicator username={typingUserName} />
+                </div>
+              )}
+              
               {/* Bottom spacing */}
               <div className="h-8"></div>
               {/* Invisible element to scroll to */}
